@@ -41,7 +41,7 @@ class Matrixm{
         Time2 = System.currentTimeMillis();
         st= String.format("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000);
         System.out.println(st);
-        //System.out.printf("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000000);
+        //System.out.printf("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000);
      
         // display 10 elements of the result matrix tto verify correctness
         System.out.println("Result matrix:");
@@ -58,7 +58,6 @@ class Matrixm{
         long Time1, Time2;
 	
         String st;
-        double temp;
         int i, j, k;
     
         double [][]pha, phb, phc;
@@ -81,18 +80,11 @@ class Matrixm{
         for(i=0; i<m_ar; i++){
             
             for( j=0; j<m_br; j++){
-                //a[i][j]
-                temp = 0;
                    
-                for(int l=0;l<m_ar;l++){
+                for(k=0;k<m_ar;k++){
 
-                    for(int m=0;m<m_ar;m++){
-                        phc[m][i]+=pha[l][j]*phb[m][l];
-                        //System.out.println("matrix a["+l+"]"+"["+j+"] * matrix b["+m+"]"+"["+l+"] += matrix c["+m+"]"+"["+i+"] ");
-                    }
-                    //m certo
+                    phc[i][k] += pha[i][j]*phb[j][k];
                 }
-                
                 
             }
         }
@@ -101,7 +93,7 @@ class Matrixm{
         Time2 = System.currentTimeMillis();
         st= String.format("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000);
         System.out.println(st);
-        //System.out.printf("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000000);
+        //System.out.printf("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000);
      
         // display 10 elements of the result matrix tto verify correctness
         System.out.println("Result matrix:");

@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <time.h>
 #include <cstdlib>
-//#include <papi.h>
+#include <papi.h>
 
 using namespace std;
 
@@ -111,7 +111,7 @@ void OnMultLine(int m_ar, int m_br)
 		{	
 			for( k=0; k<m_ar; k++)
 			{	
-				phc[i*m_ar+j/m_ar+k%m_ar] += pha[i*m_ar+j] * phb[j*m_br+k];
+				phc[i*m_ar+j/m_ar+k] += pha[i*m_ar+j] * phb[j*m_br+k];
 			}
 		}
 	}
@@ -145,7 +145,7 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
 
 
 
-/*
+
 void handle_error (int retval)
 {
   printf("PAPI error %d: %s\n", retval, PAPI_strerror(retval));
@@ -164,7 +164,7 @@ void init_papi() {
             << " REVISION: " << PAPI_VERSION_REVISION(retval) << "\n";
 }
 
-*/
+
 int main (int argc, char *argv[])
 {
 
@@ -172,7 +172,7 @@ int main (int argc, char *argv[])
 	int lin, col, blockSize;
 	int op;
 	
-/*	int EventSet = PAPI_NULL;
+	int EventSet = PAPI_NULL;
   	long long values[2];
   	int ret;
 	
@@ -193,7 +193,7 @@ int main (int argc, char *argv[])
 	ret = PAPI_add_event(EventSet,PAPI_L2_DCM);
 	if (ret != PAPI_OK) cout << "ERROR: PAPI_L2_DCM" << endl;
 
-*/
+
 	op=1;
 	do {
 		cout << endl << "1. Multiplication" << endl;
@@ -208,11 +208,11 @@ int main (int argc, char *argv[])
    		col = lin;
 	
 
-/*
+
 		// Start counting
 		ret = PAPI_start(EventSet);
 		if (ret != PAPI_OK) cout << "ERROR: Start PAPI" << endl;
-*/
+
 		switch (op){
 			case 1: 
 				OnMult(lin, col);
@@ -227,7 +227,7 @@ int main (int argc, char *argv[])
 				break;
 
 		}
-/*
+
   		ret = PAPI_stop(EventSet, values);
   		if (ret != PAPI_OK) cout << "ERROR: Stop PAPI" << endl;
   		printf("L1 DCM: %lld \n",values[0]);
@@ -237,10 +237,10 @@ int main (int argc, char *argv[])
 		if ( ret != PAPI_OK )
 			std::cout << "FAIL reset" << endl; 
 
-*/
+
 
 	}while (op != 0);
-/*
+
 	ret = PAPI_remove_event( EventSet, PAPI_L1_DCM );
 	if ( ret != PAPI_OK )
 		std::cout << "FAIL remove event" << endl; 
@@ -252,5 +252,5 @@ int main (int argc, char *argv[])
 	ret = PAPI_destroy_eventset( &EventSet );
 	if ( ret != PAPI_OK )
 		std::cout << "FAIL destroy" << endl;
-*/
+
 }
