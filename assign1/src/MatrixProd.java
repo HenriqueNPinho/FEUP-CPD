@@ -1,6 +1,6 @@
 import java.util.*;
 
-class Matrixm{
+class MatrixProd{
     
     static void OnMult(int m_ar, int m_br){
         long Time1, Time2;
