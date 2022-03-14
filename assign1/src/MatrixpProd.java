@@ -113,16 +113,10 @@ class Matrixm{
     
     }
 
-    // add code here for block x block matriz multiplication
-    static void OnMultBlock(int m_ar, int m_br, int bkSize)
-    {
-    
-    
-    }
     public static void main(String args[]){
         Scanner scanner = new Scanner(System.in);
         int op=1;
-        int lin, col, blockSize;
+        int lin, col;
         do{
             System.out.println("1. Multiplication");
             System.out.println("2. Line Multiplication");
@@ -141,11 +135,6 @@ class Matrixm{
 				    break;
 			    case 2:
 				    OnMultLine(lin, col);  
-				    break;
-			    case 3:
-				    System.out.println("Block Size?");
-				    blockSize = scanner.nextInt() ;
-				    OnMultBlock(lin, col, blockSize);  
 				    break;
             }
         }while(op != 0);
