@@ -1,31 +1,36 @@
 import java.util.*;
 
 class MatrixProd{
+    static void printTime(long Time1, long Time2){
+        System.out.printf("Time: %3.3f seconds\n", (double)(Time2 - Time1) / 1000);
+    }
+    
+    static void printMatrix(double phc[][], int m_br){
+
+        System.out.println("Result matrix: ");
+        for(int i=0; i<1; i++)
+        {	for(int j=0; j<Math.min(10,m_br); j++)
+                System.out.println(phc[i][j]+ " ");
+        }
+    }
     
     static void OnMult(int m_ar, int m_br){
         long Time1, Time2;
-	
-        String st;
         double temp;
         int i, j, k;
+
+        double [][]pha= new double[m_ar][m_br];
+        double [][]phb= new double[m_ar][m_br];
+        double [][]phc= new double[m_ar][m_br];
     
-        double [][]pha, phb, phc;
-        pha= new double[m_ar][m_br];
-        phb= new double[m_ar][m_br];
-        phc= new double[m_ar][m_br];
-    
-        for(i=0; i<m_ar; i++)
-            for(j=0; j<m_ar; j++)
+        for(i=0; i<m_ar; i++){
+            for(j=0; j<m_br; j++){
                 pha[i][j] =1.0;
-    
-        for(i=0; i<m_br; i++)
-            for(j=0; j<m_br; j++)
                 phb[i][j] = i+1;
-    
-    
+            }
+        }
     
         Time1 = System.currentTimeMillis();
-    
         for(i=0; i<m_ar; i++)
         {	for( j=0; j<m_br; j++)
             {	temp = 0;
@@ -36,47 +41,30 @@ class MatrixProd{
                 phc[i][j]=temp;
             }
         }
-    
-    
         Time2 = System.currentTimeMillis();
-        st= String.format("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000);
-        System.out.println(st);
-        //System.out.printf("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000);
-     
-        // display 10 elements of the result matrix tto verify correctness
-        System.out.println("Result matrix:");
-        for(i=0; i<1; i++)
-        {	for(j=0; j<Math.min(10,m_br); j++)
-                System.out.print(phc[i][j]+" ");
-        }
-        System.out.println();
+
+        printTime(Time1, Time2);
+        printMatrix(phc, m_br);
     }
 
     // add code here for line x line matriz multiplication
     static void OnMultLine(int m_ar, int m_br)
     {
         long Time1, Time2;
-	
-        String st;
         int i, j, k;
     
-        double [][]pha, phb, phc;
-        pha= new double[m_ar][m_br];
-        phb= new double[m_ar][m_br];
-        phc= new double[m_ar][m_br];
+        double [][]pha= new double[m_ar][m_br];
+        double [][]phb= new double[m_ar][m_br];
+        double [][]phc= new double[m_ar][m_br];
     
-        for(i=0; i<m_ar; i++)
-            for(j=0; j<m_ar; j++)
+        for(i=0; i<m_ar; i++){
+            for(j=0; j<m_br; j++){
                 pha[i][j] =1.0;
-    
-        for(i=0; i<m_br; i++)
-            for(j=0; j<m_br; j++)
                 phb[i][j] = i+1;
-    
-    
+            }
+        }
     
         Time1 = System.currentTimeMillis();
-    
         for(i=0; i<m_ar; i++){
             
             for( j=0; j<m_br; j++){
@@ -88,27 +76,17 @@ class MatrixProd{
                 
             }
         }
-    
-    
         Time2 = System.currentTimeMillis();
-        st= String.format("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000);
-        System.out.println(st);
-        //System.out.printf("Time: %3.3f seconds\n", (double)(Time2 - Time1)/1000);
-     
-        // display 10 elements of the result matrix tto verify correctness
-        System.out.println("Result matrix:");
-        for(i=0; i<1; i++)
-        {	for(j=0; j<Math.min(10,m_br); j++)
-                System.out.print(phc[i][j]+" ");
-        }
-        System.out.println();
-    
+        
+        printTime(Time1, Time2);
+        printMatrix(phc, m_br);
     }
 
     public static void main(String args[]){
         Scanner scanner = new Scanner(System.in);
         int op=1;
         int lin, col;
+
         do{
             System.out.println("1. Multiplication");
             System.out.println("2. Line Multiplication");
@@ -118,8 +96,6 @@ class MatrixProd{
             System.out.println("Dimensions: lins=cols ? ");
             lin=scanner.nextInt();
             col=lin;
-    
-            //start counting
 
             switch(op){
                 case 1: 
