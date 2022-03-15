@@ -4,6 +4,7 @@
 #include <time.h>
 #include <cstdlib>
 #include <papi.h>
+#include <math.h>
 
 using namespace std;
 
@@ -140,15 +141,15 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
 {
     SYSTEMTIME Time1, Time2;
 	
-	char st[101];
-	int i, j, k, ii, jj,kk,temp;
+	char st[100];
+	int i, j, k, ii, jj,kk;
 	double *pha, *phb, *phc;
 	
 
 		
-    pha = (double *)malloc(((m_ar * m_ar) +1) * sizeof(double));
-	phb = (double *)malloc(((m_ar * m_ar) +1) * sizeof(double));
-	phc = (double *)malloc(((m_ar * m_ar) +1) * sizeof(double));
+    pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
 
 	for(i=0; i<m_ar; i++)
 		for(j=0; j<m_ar; j++)
@@ -166,22 +167,13 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
 
 	
 	Time1=clock();
-	for(jj=0; jj<m_br; jj+=bkSize ){
-		for(ii=0; ii<m_ar; ii+=bkSize){
-			for(j=jj;j<jj+bkSize;j++){
-				for(i=ii; i<ii+bkSize; i++){
-					temp=0;
-					for( k=0; k<m_ar; k++){
-						temp+= pha[i*m_ar +k]*phb[k*m_br +j];
-
-						/*	cout<<"k= " << k << endl;
-							cout<<"j= " << j << endl;
-							cout<<"i= " << i << endl;
-							cout<<"kk= " <<kk << endl;
-							cout<<"jj= " <<jj << endl;
-							cout<<"\n\n";*/
-						}
-						phc[i*m_ar +j]=temp;		
+	for(ii=0; ii<m_ar; ii+=bkSize){
+		for(jj=0; jj<m_br; jj+=bkSize ){
+			for(i=0; i<m_ar; i++){
+				for( k=ii; k<min(m_br, ii+bkSize); k++){
+					for(j=jj; j<min(m_ar, jj+bkSize); j++){
+						phc[i*m_ar +j]+= pha[i*m_ar +k]*phb[k*m_br +j];
+					}	
 				}			
 			}	
 		}
