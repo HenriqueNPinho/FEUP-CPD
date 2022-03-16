@@ -3,9 +3,11 @@
 default: build
 
 build:	
-	sudo sh -c 'echo -1 >/proc/sys/kernel/perf_event_paranoid'
 	g++ -O2 matrixproduct.cpp -o matrix -lpapi
 	javac MatrixProd.java
+
+setup:
+	sudo sh -c 'echo -1 >/proc/sys/kernel/perf_event_paranoid'
 	
 clean:
 	rm -rf matrix
