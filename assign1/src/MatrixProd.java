@@ -1,3 +1,4 @@
+
 import java.util.*;
 
 class MatrixProd{
@@ -10,13 +11,13 @@ class MatrixProd{
         System.out.println("Result matrix: ");
         for(int i=0; i<1; i++)
         {	for(int j=0; j<Math.min(10,m_br); j++)
-                System.out.println(phc[i][j]+ " ");
+                System.out.print(phc[i][j]+ " ");
         }
+        System.out.println();
     }
     
     static void OnMult(int m_ar, int m_br){
         long Time1, Time2;
-        double temp;
         int i, j, k;
 
         double [][]pha= new double[m_ar][m_br];
@@ -33,12 +34,11 @@ class MatrixProd{
         Time1 = System.currentTimeMillis();
         for(i=0; i<m_ar; i++)
         {	for( j=0; j<m_br; j++)
-            {	temp = 0;
+            {
                 for( k=0; k<m_ar; k++)
                 {	
-                    temp += pha[i][k] * phb[k][j];
+                    phc[i][j]+= pha[i][k] * phb[k][j];
                 }
-                phc[i][j]=temp;
             }
         }
         Time2 = System.currentTimeMillis();
@@ -83,6 +83,7 @@ class MatrixProd{
     }
 
     public static void main(String args[]){
+        Locale.setDefault(Locale.US);
         Scanner scanner = new Scanner(System.in);
         int op=1;
         int lin, col;
@@ -93,10 +94,10 @@ class MatrixProd{
             System.out.println("3. Block Multiplication");
             System.out.print("Selection: "); op=scanner.nextInt();
 
-            System.out.println("Dimensions: lins=cols ? ");
+            System.out.print("Dimensions: lins=cols ? ");
             lin=scanner.nextInt();
             col=lin;
-
+            
             switch(op){
                 case 1: 
 				    OnMult(lin, col);
