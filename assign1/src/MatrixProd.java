@@ -93,6 +93,8 @@ class MatrixProd{
             System.out.println("1. Multiplication");
             System.out.println("2. Line Multiplication");
             System.out.print("Selection: "); op=scanner.nextInt();
+            if (op == 0)
+                break;
 
             System.out.print("Dimensions: lins=cols ? ");
             lin=scanner.nextInt();
