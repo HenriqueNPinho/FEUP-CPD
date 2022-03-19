@@ -15,7 +15,6 @@ class MatrixProd{
         }
         System.out.println();
     }
-    
     static void OnMult(int m_ar, int m_br){
         long Time1, Time2;
         double temp;
