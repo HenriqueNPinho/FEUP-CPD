@@ -135,8 +135,8 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
     for(int ii=0; ii<m_ar; ii+=bkSize){
 		for(int jj=0; jj<m_br; jj+=bkSize ){
 			for(int i=0; i<m_ar; i++){
-				for(int k=ii; k<ii+bkSize; k++){
-					for(int j=jj; j<jj+bkSize; j++){
+				for(int k=ii; k<min(ii+bkSize,m_ar); k++){
+					for(int j=jj; j<min(jj+bkSize,m_br); j++){
 						phc[i*m_ar +j]+= pha[i*m_ar +k]*phb[k*m_br +j];
 					}	
 				}			
