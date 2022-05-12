@@ -3,6 +3,8 @@ package Membership;
 import java.io.*;
 import java.net.*;
 
+import Main.Store;
+
 public class Receiver implements Runnable {
 
     private int port;
@@ -21,14 +23,14 @@ public class Receiver implements Runnable {
             while(true) {
 
                 Socket socket = serverSocket.accept();
-                
+
                 InputStream input = socket.getInputStream();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input));
                 
                 String message = reader.readLine();
 
-                System.out.println(message);
+                processMsg(message);;
             }
         
             
@@ -36,9 +38,43 @@ public class Receiver implements Runnable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-            
-        
-        
+               
     }
+
+
+    private void processMsg(String msg) {
+
+        switch (msg) {
+            case "JOIN":
+                int counterAux = Store.counter+1;
+
+                if(counterAux % 2 == 0) {
+                    Store.counter += 1;
+
+                    String message = "MEMBERSHIP " + Store.nodeId + " " + Integer.toString(Store.counter);
+
+                    Store.executor.execute(new SendMessage(message));
+
+                }
+                
+                break;
+
+
+            case "LEAVE":
+                int counterAux2 = Store.counter+1;
+                
+                if(counterAux2 % 2 != 0) {
+                    Store.counter += 1;
+
+
+
+                }
+            default:
+                break;
+        }
+
+    }
+
+
     
 }

@@ -1,9 +1,6 @@
-import java.io.IOException;
-import java.net.ServerSocket;
+package Main;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import Membership.*;
@@ -14,8 +11,10 @@ public class Store {
     public static int mcastPort;
     public static String nodeId;
     public static int storePort;
+    public static ScheduledThreadPoolExecutor executor;
+    public static MulticastChannel mcChannel;
 
-    public static int counter;
+    public static int counter = -1;
 
     public static ArrayList<String> log;
 
@@ -26,15 +25,18 @@ public class Store {
         nodeId = args[2];
         storePort = Integer.parseInt(args[3]);
 
+        mcChannel = new MulticastChannel(mcastAddr, mcastPort);
+
         log = new ArrayList<String>();
 
         int cores = Runtime.getRuntime().availableProcessors();
 
-        ScheduledThreadPoolExecutor executor= (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(cores);
+        executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(cores);
 
         
         executor.execute(new Receiver(storePort));
-        executor.execute(new MulticastChannel(mcastAddr, mcastPort));
+        
+        executor.execute(mcChannel);
 
         
 
