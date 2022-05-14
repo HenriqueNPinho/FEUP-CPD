@@ -5,11 +5,11 @@ import java.net.*;
 
 import Main.Store;
 
-public class Receiver implements Runnable {
+public class ProtocolReceiver implements Runnable {
 
     private int port;
 
-    public Receiver(int port) {
+    public ProtocolReceiver(int port) {
         this.port = port;
     }   
 
@@ -51,8 +51,9 @@ public class Receiver implements Runnable {
                 if(counterAux % 2 == 0) {
                     Store.counter += 1;
 
-                    String message = "MEMBERSHIP " + Store.nodeId + " " + Integer.toString(Store.counter);
-
+                    String message = "JOIN " + Store.nodeId + " " + Integer.toString(Store.counter);
+                    Store.executor.execute(new TCPChannel(Store.mcastPort));
+                    System.out.println("TCP Channel open");
                     Store.executor.execute(new SendMessage(message));
 
                 }
