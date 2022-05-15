@@ -1,5 +1,7 @@
 package Membership;
 
+import java.lang.reflect.Member;
+
 import Main.Store;
 
 public class SendMessage implements Runnable {
@@ -10,20 +12,19 @@ public class SendMessage implements Runnable {
     private String nodeId;
     private int nodePort;
 
+    private MembershipInfo membershipInfo;
+
     public SendMessage(String msg) {
         String[] msgArray = msg.split(" ");
         this.header = msgArray[0];
         this.msg = msg;
     }
 
-    public SendMessage(String header, String nodeId, int nodePort, byte[] body, byte[] body1) {
-        this.header = header;
+    public SendMessage(String nodeId, int nodePort, MembershipInfo membershipInfo) {
+        this.header = "MEMBERSHIP";
         this.nodeId = nodeId;
         this.nodePort = nodePort;
-    }
-
-    public SendMessage(String header, byte[] body) {
-        this.header = header;
+        this.membershipInfo = membershipInfo;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class SendMessage implements Runnable {
 
                 // MEMBERSHIP WITH THE MOST RECENT LOGS
 
-                Store.mcChannel.sendMessage(msg);
+                //Store.mcChannel.sendMessage(msg);
 
             
                 
@@ -45,8 +46,8 @@ public class SendMessage implements Runnable {
 
             case "MEMBERSHIP":
 
-                
-                TCPChannel.sendMessage(nodeId, nodePort, null);
+                System.out.println("ENVIAR");
+                TCPChannel.sendMessage(nodeId, nodePort, membershipInfo);
 
             
                 break;

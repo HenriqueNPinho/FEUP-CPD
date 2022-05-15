@@ -1,8 +1,7 @@
 package Main;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.*;
 
 import Membership.*;
 
@@ -12,6 +11,7 @@ public class Store {
     public static int mcastPort;
     public static String nodeId;
     public static int storePort;
+    
     public static ScheduledThreadPoolExecutor executor;
     public static MulticastChannel mcChannel;
 
@@ -42,7 +42,9 @@ public class Store {
 
         executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(cores);
 
-        deserializeCounter();
+        loadCounter();
+
+        System.out.println(counter);
         
         executor.execute(new ProtocolReceiver(storePort));
         System.out.println("Potocol channel open");
@@ -52,7 +54,7 @@ public class Store {
         executor.execute(mcChannel);
         System.out.println("MCast Channel open");
 
-        Runtime.getRuntime().addShutdownHook(new Thread(Store::serializeCounter));
+        Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
 
         
 
@@ -104,8 +106,8 @@ public class Store {
     public static String[] getNodes() {
         String[] nodes = new String[32];
         int j = 0;
-
-        for(int i = 0; i < log.size(); i++) {
+        return nodes;
+        /**for(int i = 0; i < log.size(); i++) {
             String[] nodeInfo = log.get(i).split(" ");
             int counter = Integer.parseInt(nodeInfo[1]);
             
@@ -115,13 +117,13 @@ public class Store {
             }
         }
 
-        return nodes;
+        return nodes;*/
     }
 
 
-    private static void serializeCounter() {
+    private static void saveCounter() {
         try {
-            String filename = nodeId + "/counter.ser";
+            String filename = "Nodes/"+nodeId + "/counter";
             
             File file = new File(filename);
             if (!file.exists()) {
@@ -135,15 +137,17 @@ public class Store {
             out.close();
             fileOut.close();
 
+            Store.executor.shutdown();
+
         } catch (IOException i) {
             i.printStackTrace();
         }
     }
 
     //loads this peer storage from a file called storage.ser if it exists
-    private static void deserializeCounter() {
+    private static void loadCounter() {
         try {
-            String filename = nodeId + "/counter.ser";
+            String filename = "Nodes/"+nodeId + "/counter";
 
             File file = new File(filename);
             if (!file.exists()) {

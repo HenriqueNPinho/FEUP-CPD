@@ -51,7 +51,7 @@ public class ProtocolReceiver implements Runnable {
                 if(counterAux % 2 == 0) {
                     Store.counter += 1;
 
-                    String message = "JOIN " + Store.nodeId + " " + Integer.toString(Store.counter);
+                    String message = "JOIN " + Store.nodeId +" "+ Integer.toString(Store.mcastPort) + " " + Integer.toString(Store.counter);
                     Store.executor.execute(new TCPChannel(Store.mcastPort));
                     System.out.println("TCP Channel open");
                     Store.executor.execute(new SendMessage(message));

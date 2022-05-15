@@ -15,14 +15,21 @@ public class TCPChannel implements Runnable {
         this.port = port;
     }
 
-    public static void sendMessage(String nodeId, int nodePort, byte[] msg) {
+    public static void sendMessage(String nodeId, int nodePort, MembershipInfo membershipInfo) {
         
         
         try (Socket socket = new Socket(nodeId, nodePort)) {
  
             OutputStream output = socket.getOutputStream();
-            DataOutputStream dataOutput = new DataOutputStream(output);
-            dataOutput.write(msg);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(output);
+            
+            objectOutputStream.writeObject(membershipInfo);
+
+            objectOutputStream.close();
+            output.close();
+            socket.close();
+
+            System.out.println("TCP object sent");
 
         } catch (UnknownHostException ex) {
 
@@ -41,33 +48,53 @@ public class TCPChannel implements Runnable {
     @Override
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(this.port)) {
+            
+            while(this.counter < 3) {
 
-            //while(this.counter < 3) {
+                System.out.println(counter);
 
+                if(counter > 0) {
+                    System.out.println("SENT MCAST AGAIN");
+                    String msg = "JOIN "+Store.nodeId+" "+Integer.toString(Store.mcastPort)+" "+Integer.toString(Store.counter);
+                    Store.executor.execute(new SendMessage(msg));
+                }
                 Socket socket = serverSocket.accept();
 
                 InputStream input = socket.getInputStream();
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-                
-                String message = reader.readLine();
 
-                System.out.println(message);
+                ObjectInputStream objectInputStream = new ObjectInputStream(input);
+                
+                try {
+                    MembershipInfo membershipInfo = (MembershipInfo) objectInputStream.readObject();
+                    System.out.println(membershipInfo.msg);
+                } catch (ClassNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
 
                 this.counter++;
+            }
 
 
-                serverSocket.close();
+            serverSocket.close();
 
-            //}
+            /**String[] recentLogs = membershipInfo.getRecentLogs();
 
-            Store.executor.scheduleAtFixedRate(new SendMessage(null), 1, 1, TimeUnit.SECONDS);
+            for(int i = 0; i < recentLogs.length; i++) {
+                Store.log.add(recentLogs[i]);
+            }*/
+
+
+            Store.executor.scheduleAtFixedRate(new SendMessage(new String()), 1, 1, TimeUnit.SECONDS);
 
 
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            System.out.println("TCP");
         }
         
     }
