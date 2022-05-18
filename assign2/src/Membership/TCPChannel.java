@@ -25,11 +25,16 @@ public class TCPChannel implements Runnable {
             
             objectOutputStream.writeObject(membershipInfo);
 
+            InputStream input = socket.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+
+            String response = reader.readLine();
+
+            System.out.println(response);
+
             objectOutputStream.close();
             output.close();
             socket.close();
-
-            System.out.println("TCP object sent");
 
         } catch (UnknownHostException ex) {
 
@@ -54,7 +59,7 @@ public class TCPChannel implements Runnable {
                 System.out.println(counter);
 
                 if(counter > 0) {
-                    System.out.println("SENT MCAST AGAIN");
+                    
                     String msg = "JOIN "+Store.nodeId+" "+Integer.toString(Store.mcastPort)+" "+Integer.toString(Store.counter);
                     Store.executor.execute(new SendMessage(msg));
                 }
@@ -64,10 +69,27 @@ public class TCPChannel implements Runnable {
 
 
                 ObjectInputStream objectInputStream = new ObjectInputStream(input);
+
+                OutputStream output = socket.getOutputStream();
+                PrintWriter writer = new PrintWriter(output, true);
+
+                writer.println("Membership info received "+ Store.nodeId);
                 
                 try {
-                    MembershipInfo membershipInfo = (MembershipInfo) objectInputStream.readObject();
-                    System.out.println(membershipInfo.msg);
+                
+                
+                
+                    Object objectReceived = objectInputStream.readObject();
+
+                    if(objectReceived instanceof MembershipInfo) {
+                        MembershipInfo membershipInfo = (MembershipInfo) objectReceived;
+                        System.out.println("Info: "+membershipInfo.getRecentLogs()[0]);
+                    
+                        //Store.addToLog(membershipInfo.getRecentLogs());
+                    }
+
+                
+                
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -77,7 +99,7 @@ public class TCPChannel implements Runnable {
                 this.counter++;
             }
 
-
+            
             serverSocket.close();
 
             /**String[] recentLogs = membershipInfo.getRecentLogs();

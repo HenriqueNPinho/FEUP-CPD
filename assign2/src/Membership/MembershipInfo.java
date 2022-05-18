@@ -5,7 +5,6 @@ import java.io.Serializable;
 public class MembershipInfo implements Serializable {
     private String[] nodes;
     private String[] recentLogs;
-    public String msg = "HELLO";
 
     public MembershipInfo(){}
 

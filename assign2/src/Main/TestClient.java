@@ -12,7 +12,7 @@ public class TestClient {
         String[] nodeAp = args[0].split(":");
         nodeId = nodeAp[0];
         nodePort = Integer.parseInt(nodeAp[1]);
-        operation = args[1];
+        operation = args[1].toUpperCase();
 
 
         switch (operation) {
@@ -22,7 +22,8 @@ public class TestClient {
  
                     OutputStream output = socket.getOutputStream();
                     PrintWriter writer = new PrintWriter(output, true);
-                    writer.println(operation.toString());
+                    String msg = operation + "\r\n\r\n";
+                    writer.println(msg.toString());
 
                 } catch (UnknownHostException ex) {
     
@@ -33,6 +34,55 @@ public class TestClient {
                     System.out.println("I/O error: " + ex.getMessage());
                 }
                 
+                break;
+
+            case "PUT":
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                break;
+
+            case "GET":
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                break;
+
+            case "DELETE":
+
+
+
+
+
+
+
+
+
                 break;
         
             default:

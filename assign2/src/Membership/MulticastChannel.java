@@ -1,11 +1,8 @@
 package Membership;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Arrays;
 
 import Main.Store;
 
@@ -26,13 +23,11 @@ public class MulticastChannel implements Runnable {
         }
     }
 
-    public void sendMessage(String msg) {
+    public static void sendMessage(byte[] msg) {
         
         try (DatagramSocket sender = new DatagramSocket()) {
-
-            byte[] sbuf = msg.getBytes();
             
-            DatagramPacket msgPacket = new DatagramPacket(sbuf, sbuf.length, address, port);
+            DatagramPacket msgPacket = new DatagramPacket(msg, msg.length, address, port);
             
             sender.send(msgPacket);
 
@@ -56,10 +51,10 @@ public class MulticastChannel implements Runnable {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
                 multicastSocket.receive(packet);
-                
-                String received = new String(packet.getData());
 
-                Store.executor.execute(new ReceivedMessage(received));
+                byte[] bufferCopy = Arrays.copyOf(buf, packet.getLength());                
+
+                Store.executor.execute(new ReceivedMessage(bufferCopy));
                 
             }
         
