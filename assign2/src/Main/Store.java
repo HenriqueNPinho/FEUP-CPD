@@ -16,7 +16,7 @@ public class Store {
     public static ScheduledThreadPoolExecutor executor;
     
 
-    public static int counter = -1;
+    public static int counter;
 
     public static ArrayList<String> log;
 
@@ -42,7 +42,7 @@ public class Store {
         int cores = Runtime.getRuntime().availableProcessors();
         executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(cores);
 
-        //loadCounter();
+        loadCounter();
         
         executor.execute(new ProtocolReceiver(storePort));
         System.out.println(" > TCP Potocol Channel Open on: " + Integer.toString(storePort));
@@ -54,7 +54,7 @@ public class Store {
        
         
         
-        //Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
+        Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
 
         
 
@@ -81,13 +81,13 @@ public class Store {
     }
 
 
-    public static void addToLog(String[] logs) {
+    public static synchronized void addToLog(ArrayList<String> logs) {
         boolean skipLine = false;
 
-        for(int i = 0; i < logs.length; i++) {
+        for(int i = 0; i < logs.size(); i++) {
             skipLine = false;
             
-            String[] newLogLine = logs[i].split(" ");
+            String[] newLogLine = logs.get(i).split(" ");
             
             for(int j = 0; j < log.size(); j++) {
                 String[] logLine = log.get(j).split(" ");
@@ -95,7 +95,7 @@ public class Store {
                 if(newLogLine[0].equals(logLine[0])) {
                     
                     if(Integer.parseInt(logLine[1]) < Integer.parseInt(newLogLine[1])) {
-                        log.set(i, logs[j]);
+                        log.set(i, logs.get(j));
                     }
                     skipLine = true;
                     break;
@@ -103,7 +103,7 @@ public class Store {
             }
 
             if(skipLine) continue;
-            log.add(log.size(), logs[i]);
+            log.add(log.size(), logs.get(i));
             
         }
 
@@ -116,11 +116,12 @@ public class Store {
             String line = "#"+Integer.toString(i+1)+": " + log.get(i);
             System.out.println(line);
         }
+        System.out.println();
     }
 
 
-    public static String[] getLogs() {
-        String[] logs = new String[32];
+    public static ArrayList<String> getLogs() {
+        ArrayList<String> logs = new ArrayList<String>();
 
         int logSize = log.size();
 
@@ -133,7 +134,7 @@ public class Store {
         int j = 0;
 
         for(; i < log.size(); i++) {
-            logs[j] = log.get(i);
+            logs.add(log.get(i));
             j++;
         }
 
@@ -141,8 +142,8 @@ public class Store {
     }
 
 
-    public static String[] getNodes() {
-        String[] nodes = new String[32];
+    public static ArrayList<String> getNodes() {
+        ArrayList<String> nodes = new ArrayList<String>();
         int j = 0;
         
         for(int i = 0; i < log.size(); i++) {
@@ -151,7 +152,7 @@ public class Store {
             
             if(counter % 2 == 0) {
                 
-                nodes[j] = nodeInfo[0].trim();
+                nodes.add(j, nodeInfo[0].trim());
                 j++;
             }
         }

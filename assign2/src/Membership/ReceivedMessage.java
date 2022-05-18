@@ -14,8 +14,6 @@ public class ReceivedMessage implements Runnable{
 
     public ReceivedMessage(byte[] msg) {
         msgBytes = msg;
-        
-        
     }
 
     @Override
@@ -26,19 +24,19 @@ public class ReceivedMessage implements Runnable{
         String message = new String(headerByte);
         String[] headerInfo = message.trim().split(" ");
 
-        String header = headerInfo[0];
+        String header = headerInfo[0].trim();
 
         switch (header) {
             case "MEMBERSHIP":
-
+            
                 try {
                     byte[] body = headerAndBody.get(1);
 
-                    String[] recentEvents = (String[]) Util.deserialize(body);
-
+                    ArrayList<String> recentEvents = (ArrayList<String>) Util.deserialize(body);
+                    
                     Store.addToLog(recentEvents);
 
-
+                    Store.printLog();
 
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
@@ -97,8 +95,8 @@ public class ReceivedMessage implements Runnable{
 
     private void sendMembershipInfo(String nodeId, String nodePort) {
        
-        String[] logs = Store.getLogs();
-        String[] nodes = Store.getNodes();
+        ArrayList<String> logs = Store.getLogs();
+        ArrayList<String> nodes = Store.getNodes();
         
         MembershipInfo membershipInfo = new MembershipInfo(nodes, logs);
 
@@ -106,7 +104,7 @@ public class ReceivedMessage implements Runnable{
                     
         Random random = new Random();
 
-        Store.executor.schedule(new SendMessage(nodeId, Integer.parseInt(nodePort), membershipInfo), random.nextInt(401), TimeUnit.MILLISECONDS);
+        Store.executor.schedule(new SendMessage(nodeId, Integer.parseInt(nodePort), membershipInfo), random.nextInt(900), TimeUnit.MILLISECONDS);
 
         System.out.println("> Membership Info sent to: " + nodeId);
     }

@@ -16,8 +16,6 @@ public class ProtocolReceiver implements Runnable {
     @Override
     public void run() {
     
-       
-
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             while(true) {
@@ -45,7 +43,7 @@ public class ProtocolReceiver implements Runnable {
     private void processMessage(String msg) {
 
 
-        String[] header = getHeader(msg).split(" ");
+        String[] header = msg.trim().split(" ");
 
         String operation = header[0];
         
@@ -79,7 +77,6 @@ public class ProtocolReceiver implements Runnable {
                     String message = "LEAVE " + Store.nodeId + " " + Integer.toString(Store.mcastPort) + " " + Integer.toString(Store.counter) + "\r\n\r\n";
 
                     Store.executor.execute(new SendMessage(message));
-
                 }
 
                 break;
@@ -130,18 +127,4 @@ public class ProtocolReceiver implements Runnable {
         
     }
 
-
-
-
-
-    private String getHeader(String msg) {
-        int i = 0;
-        for(; i < msg.length(); i++) {
-            if(msg.charAt(i) == 0xD && msg.charAt(i+1) == 0xA && msg.charAt(i+2) == 0xD && msg.charAt(i+3) == 0xA)
-                break;
-        }
-
-        return msg.substring(0, i).trim();
-
-    }   
 }

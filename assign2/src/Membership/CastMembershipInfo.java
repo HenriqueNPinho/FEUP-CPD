@@ -2,21 +2,21 @@ package Membership;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 import Main.Store;
 
 public class CastMembershipInfo implements Runnable {
 
 
-    String[] recentEvents;
-    String msg;
+    ArrayList<String> recentEvents;
     private InetAddress address;
     private int port;
 
-    public CastMembershipInfo(String hostName, int port, MembershipInfo membershipInfo) {
+    public CastMembershipInfo(String hostName, int port, ArrayList<String> recentLogs) {
         try {
            
-            recentEvents = membershipInfo.getRecentLogs();
+            recentEvents = recentLogs;
             this.port = port;
             address = InetAddress.getByName(hostName);
         
@@ -25,17 +25,6 @@ public class CastMembershipInfo implements Runnable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    public CastMembershipInfo(String hostName, int portN, String msg) {
-        try {
-            address = InetAddress.getByName(hostName);
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        port = portN;
-        this.msg = msg;
     }
 
     @Override

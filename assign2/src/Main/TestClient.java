@@ -22,8 +22,8 @@ public class TestClient {
  
                     OutputStream output = socket.getOutputStream();
                     PrintWriter writer = new PrintWriter(output, true);
-                    String msg = operation + "\r\n\r\n";
-                    writer.println(msg.toString());
+                    
+                    writer.println(operation.toString());
 
                 } catch (UnknownHostException ex) {
     

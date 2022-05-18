@@ -1,23 +1,24 @@
 package Membership;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class MembershipInfo implements Serializable {
-    private String[] nodes;
-    private String[] recentLogs;
+    private ArrayList<String> nodes;
+    private ArrayList<String> recentLogs;
 
     public MembershipInfo(){}
 
-    public MembershipInfo(String[] nodes, String[] recentLogs) {
+    public MembershipInfo(ArrayList<String> nodes, ArrayList<String> recentLogs) {
         this.nodes = nodes;
         this.recentLogs = recentLogs;
     }
 
-    public String[] getNodes() {
+    public ArrayList<String> getNodes() {
         return this.nodes;
     }
 
-    public String[] getRecentLogs() {
+    public ArrayList<String> getRecentLogs() {
         return this.recentLogs;
     }
     

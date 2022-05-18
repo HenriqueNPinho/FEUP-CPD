@@ -55,14 +55,13 @@ public class TCPChannel implements Runnable {
         try (ServerSocket serverSocket = new ServerSocket(this.port)) {
             
             while(this.counter < 3) {
-
                 System.out.println(counter);
-
                 if(counter > 0) {
                     
-                    String msg = "JOIN "+Store.nodeId+" "+Integer.toString(Store.mcastPort)+" "+Integer.toString(Store.counter);
+                    String msg = "JOIN "+Store.nodeId+" "+Integer.toString(Store.mcastPort)+" "+Integer.toString(Store.counter)+"\r\n\r\n";
                     Store.executor.execute(new SendMessage(msg));
                 }
+
                 Socket socket = serverSocket.accept();
 
                 InputStream input = socket.getInputStream();
@@ -75,43 +74,30 @@ public class TCPChannel implements Runnable {
 
                 writer.println("Membership info received "+ Store.nodeId);
                 
-                try {
-                
-                
+                try {                
                 
                     Object objectReceived = objectInputStream.readObject();
 
                     if(objectReceived instanceof MembershipInfo) {
                         MembershipInfo membershipInfo = (MembershipInfo) objectReceived;
-                        System.out.println("Info: "+membershipInfo.getRecentLogs()[0]);
-                    
-                        //Store.addToLog(membershipInfo.getRecentLogs());
-                    }
+                        if (counter == 2) {
 
-                
+                            Store.addToLog(membershipInfo.getRecentLogs());
+                        }
+                        
+                    }                
                 
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
 
-
                 this.counter++;
             }
 
+            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 1, 1, TimeUnit.SECONDS);
             
             serverSocket.close();
-
-            /**String[] recentLogs = membershipInfo.getRecentLogs();
-
-            for(int i = 0; i < recentLogs.length; i++) {
-                Store.log.add(recentLogs[i]);
-            }*/
-
-
-            Store.executor.scheduleAtFixedRate(new SendMessage(new String()), 1, 1, TimeUnit.SECONDS);
-
-
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
