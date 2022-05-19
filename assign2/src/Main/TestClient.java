@@ -1,30 +1,44 @@
 package Main;
-import java.io.*;
-import java.net.*;
+
+import java.rmi.*;
+import java.rmi.registry.*;
+
+import RMI.RMIRemote;
 
 public class TestClient {
     
     public static String nodeId;
-    public static int nodePort;
+    public static String accessPoint;
     public static String operation;
     
     public static void main(String[] args) {
-        String[] nodeAp = args[0].split(":");
-        nodeId = nodeAp[0];
-        nodePort = Integer.parseInt(nodeAp[1]);
-        operation = args[1].toUpperCase();
+        try {
+            String[] nodeAp = args[0].split(":");
+            nodeId = nodeAp[0];
+            accessPoint = nodeAp[1];
+            operation = args[1].toUpperCase();
 
-
-        switch (operation) {
-            case "JOIN":
-            case "LEAVE":
-                try (Socket socket = new Socket(nodeId, nodePort)) {
- 
+            Registry registry;
+            registry = LocateRegistry.getRegistry(nodeId);
+            RMIRemote node = (RMIRemote) registry.lookup(accessPoint);
+            
+            
+            switch (operation) {
+                case "JOIN":
+                    node.join();
+                    break;
+                case "LEAVE":
+                    node.leave();
+                    break;
+                
+                /**
+                 try (Socket socket = new Socket(nodeId, nodePort)) {
+                     
                     OutputStream output = socket.getOutputStream();
                     PrintWriter writer = new PrintWriter(output, true);
                     
                     writer.println(operation.toString());
-
+                    
                 } catch (UnknownHostException ex) {
     
                     System.out.println("Server not found: " + ex.getMessage());
@@ -32,28 +46,29 @@ public class TestClient {
                 } catch (IOException ex) {
         
                     System.out.println("I/O error: " + ex.getMessage());
-                }
+                }*/
+                
+                case "PUT":
+                
+                
+                   
+                
+                
+                
+                
+                
+                
+                
+                
                 
                 break;
 
-            case "PUT":
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                break;
-
             case "GET":
+            
+            
+            
+
+            
 
 
 
@@ -61,32 +76,34 @@ public class TestClient {
 
 
 
+            
+            
+            
 
-
-
-
-
-
-
-
-
-
+            
                 break;
 
-            case "DELETE":
+                case "DELETE":
+                
+                
 
+                
 
-
-
-
-
-
-
-
+                
+                
+                
+                
                 break;
-        
-            default:
+                
+                default:
                 break;
+            }
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         }
     }
-}
