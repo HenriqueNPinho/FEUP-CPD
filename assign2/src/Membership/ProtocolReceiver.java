@@ -16,8 +16,6 @@ public class ProtocolReceiver implements Runnable {
     @Override
     public void run() {
     
-       
-
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             while(true) {
@@ -30,7 +28,7 @@ public class ProtocolReceiver implements Runnable {
                 
                 String message = reader.readLine();
 
-                processMsg(message);;
+                processMessage(message);
             }
         
             
@@ -42,20 +40,29 @@ public class ProtocolReceiver implements Runnable {
     }
 
 
-    private void processMsg(String msg) {
+    private void processMessage(String msg) {
 
-        switch (msg) {
+
+        String[] header = msg.trim().split(" ");
+
+        String operation = header[0];
+        
+
+        switch (operation) {
+
             case "JOIN":
                 int counterAux = Store.counter+1;
 
                 if(counterAux % 2 == 0) {
                     Store.counter += 1;
-
-                    String message = "JOIN " + Store.nodeId +" "+ Integer.toString(Store.mcastPort) + " " + Integer.toString(Store.counter);
+                    
                     Store.executor.execute(new TCPChannel(Store.mcastPort));
-                    System.out.println("TCP Channel open");
+                    
+                    System.out.println("> TCP Membership Channel Open on: " + Integer.toString(Store.mcastPort));
+                    
+                    String message = "JOIN " + Store.nodeId + " " + Integer.toString(Store.mcastPort) + " " + Integer.toString(Store.counter) + "\r\n\r\n";
                     Store.executor.execute(new SendMessage(message));
-
+                    
                 }
                 
                 break;
@@ -67,15 +74,57 @@ public class ProtocolReceiver implements Runnable {
                 if(counterAux2 % 2 != 0) {
                     Store.counter += 1;
 
+                    String message = "LEAVE " + Store.nodeId + " " + Integer.toString(Store.mcastPort) + " " + Integer.toString(Store.counter) + "\r\n\r\n";
 
-
+                    Store.executor.execute(new SendMessage(message));
                 }
+
+                break;
+
+
+            case "PUT":
+                String filepath = header[1];
+                String value = header[2];
+                    
+
+
+
+
+
+
+                break;
+
+            case "GET":
+                String key = header[1];
+
+
+
+
+
+
+
+                break;
+
+
+            case "DELETE":                    
+                String key_ = header[1];
+
+
+
+
+
+
+
+
+                break;
+
+                
             default:
                 break;
         }
 
+
+        
     }
 
-
-    
 }

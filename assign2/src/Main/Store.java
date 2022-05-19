@@ -1,4 +1,5 @@
 package Main;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -13,7 +14,7 @@ public class Store {
     public static int storePort;
     
     public static ScheduledThreadPoolExecutor executor;
-    public static MulticastChannel mcChannel;
+    
 
     public static int counter;
 
@@ -23,8 +24,8 @@ public class Store {
 
     public static void main(String[] args) {
 
-        if(args.length < 4) {
-            System.err.println("Nr of arguments low");
+        if(args.length != 4) {
+            System.err.println("USAGE: java <mcast_addr> <mcast_port> <node_id> <store_port>");
             return;
         }
 
@@ -33,27 +34,26 @@ public class Store {
         nodeId = args[2];
         storePort = Integer.parseInt(args[3]);
 
-        mcChannel = new MulticastChannel(mcastAddr, mcastPort);
-
+        
         log = new ArrayList<String>();
-        sentClusterInfo = new ArrayList<>();
+
+        sentClusterInfo = new ArrayList<String>();
 
         int cores = Runtime.getRuntime().availableProcessors();
-
         executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(cores);
 
         loadCounter();
-
-        System.out.println(counter);
         
         executor.execute(new ProtocolReceiver(storePort));
-        System.out.println("Potocol channel open");
+        System.out.println(" > TCP Potocol Channel Open on: " + Integer.toString(storePort));
+        
+        executor.execute(new MulticastChannel(mcastAddr, mcastPort));
+        System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
 
+        //executor.scheduleWithFixedDelay(new CastMembershipInfo(mcastAddr, mcastPort,"CASTING...."), 5, 1, TimeUnit.SECONDS);
+       
         
         
-        executor.execute(mcChannel);
-        System.out.println("MCast Channel open");
-
         Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
 
         
@@ -65,6 +65,7 @@ public class Store {
 
 
     public static void addLogEntry(String nodeId, String counter) {
+        sentClusterInfo.clear(); // Clears nodes sent membership info list
         
         for(int i = 0; i < log.size(); i++) {
             String[] nodeInfo = log.get(i).split(" ");
@@ -75,14 +76,52 @@ public class Store {
             }
         }
 
-        
         log.add(nodeId + " " + counter);
         
     }
 
 
-    public static String[] getLogs() {
-        String[] logs = new String[32];
+    public static synchronized void addToLog(ArrayList<String> logs) {
+        boolean skipLine = false;
+
+        for(int i = 0; i < logs.size(); i++) {
+            skipLine = false;
+            
+            String[] newLogLine = logs.get(i).split(" ");
+            
+            for(int j = 0; j < log.size(); j++) {
+                String[] logLine = log.get(j).split(" ");
+                
+                if(newLogLine[0].equals(logLine[0])) {
+                    
+                    if(Integer.parseInt(logLine[1]) < Integer.parseInt(newLogLine[1])) {
+                        log.set(i, logs.get(j));
+                    }
+                    skipLine = true;
+                    break;
+                }
+            }
+
+            if(skipLine) continue;
+            log.add(log.size(), logs.get(i));
+            
+        }
+
+
+        
+    }
+
+    public static void printLog() {
+        for(int i = 0; i < log.size(); i++) {
+            String line = "#"+Integer.toString(i+1)+": " + log.get(i);
+            System.out.println(line);
+        }
+        System.out.println();
+    }
+
+
+    public static ArrayList<String> getLogs() {
+        ArrayList<String> logs = new ArrayList<String>();
 
         int logSize = log.size();
 
@@ -95,7 +134,7 @@ public class Store {
         int j = 0;
 
         for(; i < log.size(); i++) {
-            logs[j] = log.get(i);
+            logs.add(log.get(i));
             j++;
         }
 
@@ -103,27 +142,28 @@ public class Store {
     }
 
 
-    public static String[] getNodes() {
-        String[] nodes = new String[32];
+    public static ArrayList<String> getNodes() {
+        ArrayList<String> nodes = new ArrayList<String>();
         int j = 0;
-        return nodes;
-        /**for(int i = 0; i < log.size(); i++) {
+        
+        for(int i = 0; i < log.size(); i++) {
             String[] nodeInfo = log.get(i).split(" ");
-            int counter = Integer.parseInt(nodeInfo[1]);
+            int counter = Integer.parseInt(nodeInfo[1].trim());
             
             if(counter % 2 == 0) {
-                nodes[j] = nodeInfo[0];
+                
+                nodes.add(j, nodeInfo[0].trim());
                 j++;
             }
         }
 
-        return nodes;*/
+        return nodes;
     }
 
 
     private static void saveCounter() {
         try {
-            String filename = "Nodes/"+nodeId + "/counter";
+            String filename = "Nodes/" + nodeId + "/counter";
             
             File file = new File(filename);
             if (!file.exists()) {
@@ -134,6 +174,7 @@ public class Store {
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(counter);
+            
             out.close();
             fileOut.close();
 
@@ -147,7 +188,7 @@ public class Store {
     //loads this peer storage from a file called storage.ser if it exists
     private static void loadCounter() {
         try {
-            String filename = "Nodes/"+nodeId + "/counter";
+            String filename = "Nodes/" + nodeId + "/counter";
 
             File file = new File(filename);
             if (!file.exists()) {
@@ -157,13 +198,15 @@ public class Store {
 
             FileInputStream fileIn = new FileInputStream(filename);
             ObjectInputStream in = new ObjectInputStream(fileIn);
+            
             counter = (Integer) in.readObject();
+            
             in.close();
             fileIn.close();
+
         } catch (IOException i) {
             i.printStackTrace();
         } catch (ClassNotFoundException c) {
-            System.out.println("Integer class not found");
             c.printStackTrace();
         }
     }

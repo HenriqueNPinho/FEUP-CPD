@@ -1,8 +1,5 @@
 package Membership;
 
-import java.lang.reflect.Member;
-
-import Main.Store;
 
 public class SendMessage implements Runnable {
 
@@ -34,7 +31,7 @@ public class SendMessage implements Runnable {
             case "JOIN":
             case "LEAVE":
                 
-                Store.mcChannel.sendMessage(msg);
+                MulticastChannel.sendMessage(msg.getBytes());
 
                 // MEMBERSHIP WITH THE MOST RECENT LOGS
 
@@ -46,7 +43,7 @@ public class SendMessage implements Runnable {
 
             case "MEMBERSHIP":
 
-                System.out.println("ENVIAR");
+            
                 TCPChannel.sendMessage(nodeId, nodePort, membershipInfo);
 
             
