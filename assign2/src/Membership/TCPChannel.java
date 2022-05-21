@@ -55,7 +55,7 @@ public class TCPChannel implements Runnable {
         try (ServerSocket serverSocket = new ServerSocket(this.port)) {
             
             while(this.counter < 3) {
-                System.out.println(counter);
+                
                 if(counter > 0) {
                     
                     String msg = "JOIN "+Store.nodeId+" "+Integer.toString(Store.mcastPort)+" "+Integer.toString(Store.counter)+"\r\n\r\n";
