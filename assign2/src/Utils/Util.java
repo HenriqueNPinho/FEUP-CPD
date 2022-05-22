@@ -15,4 +15,10 @@ public class Util {
         ObjectInputStream is = new ObjectInputStream(in);
         return is.readObject();
     }
+
+    public static int getNodePort(String nodeId) {
+        String[] nodeIdSplit = nodeId.split(".");
+        int n = Integer.parseInt(nodeIdSplit[3]);
+        return 3000+n;
+    }
 }

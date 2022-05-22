@@ -62,10 +62,11 @@ public class TCPChannel implements Runnable {
                     Store.executor.execute(new SendMessage(msg));
                 }
 
+                serverSocket.setSoTimeout(3000);
+
                 Socket socket = serverSocket.accept();
 
                 InputStream input = socket.getInputStream();
-
 
                 ObjectInputStream objectInputStream = new ObjectInputStream(input);
 
@@ -85,7 +86,7 @@ public class TCPChannel implements Runnable {
                             Store.addToLog(membershipInfo.getRecentLogs());
                         }
                         
-                    }                
+                    }    
                 
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block

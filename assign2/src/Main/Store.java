@@ -9,12 +9,14 @@ import java.util.concurrent.*;
 
 import Membership.*;
 import RMI.RMIRemote;
+import Storage.*;
 
 public class Store implements RMIRemote {
 
     public static String mcastAddr;
     public static int mcastPort;
     public static String nodeId;
+    public static int storePort;
     
     public static ScheduledThreadPoolExecutor executor;
     
@@ -25,10 +27,15 @@ public class Store implements RMIRemote {
 
     public static ArrayList<String> sentClusterInfo;
 
-    private Store(String mcastA, int mcastP, String node) {
+    public static Bucket bucket;
+
+    public static ArrayList<String> currentNodes;
+
+    private Store(String mcastA, int mcastP, String node, int port) {
         mcastAddr = mcastA;
         mcastPort = mcastP;
         nodeId = node;
+        storePort = port;
     }
 
     public static void main(String[] args) {
@@ -38,12 +45,7 @@ public class Store implements RMIRemote {
             return;
         }
 
-        /**mcastAddr = args[0];
-        mcastPort = Integer.parseInt(args[1]);
-        nodeId = args[2];
-        storePort = Integer.parseInt(args[3]);*/
-
-        Store obj = new Store(args[0], Integer.parseInt(args[1]), args[2]);
+        Store obj = new Store(args[0], Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
         String accessPoint = args[3];
 
         try {
@@ -60,34 +62,41 @@ public class Store implements RMIRemote {
             e.printStackTrace();
         }
 
-
-        
-        log = new ArrayList<String>();
-
-        sentClusterInfo = new ArrayList<String>();
+        sentClusterInfo = new ArrayList<>();
+        currentNodes = new ArrayList<>();
 
         int cores = Runtime.getRuntime().availableProcessors();
         executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(cores);
 
         loadCounter();
-        
-        //executor.execute(new ProtocolReceiver(storePort));
-        //System.out.println(" > TCP Potocol Channel Open on: " + Integer.toString(storePort));
-        
+
+        System.out.println(Store.counter);
+
+        executor.execute(new ProtocolReceiver(storePort));
+        System.out.println(" > TCP Potocol Channel Open on: " + Integer.toString(storePort));
+
+        if(isMember()) {
+        }
+        loadLog();
         executor.execute(new MulticastChannel(mcastAddr, mcastPort));
         System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
+        
+
+        //executor.scheduleAtFixedRate(new SetCurrentNodes(), 0, 1, TimeUnit.SECONDS);
+
 
         //executor.scheduleWithFixedDelay(new CastMembershipInfo(mcastAddr, mcastPort,"CASTING...."), 5, 1, TimeUnit.SECONDS);
-       
-        
+    
         
         Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
+        Runtime.getRuntime().addShutdownHook(new Thread(Store::saveLog));
+    }
 
-        
+    public static boolean isMember() {
+        if(Store.counter % 2 == 0)
+            return true;
 
-        //ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1);
-
-        //scheduled.scheduleAtFixedRate(new MulticastReceiver(), 0, 1, TimeUnit.SECONDS);
+        return false;
     }
 
 
@@ -187,11 +196,73 @@ public class Store implements RMIRemote {
         return nodes;
     }
 
+    private static void saveLog() {
+        try {
+            String filename = "Nodes/" + nodeId + "/log.txt";
+            File file = new File(filename);
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }
+            
+            PrintWriter out = new PrintWriter(filename);
+
+            for(String logLine : log) {
+                out.println(logLine);
+            }
+
+            out.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private static void loadLog() {
+        try {
+            String filename = "Nodes/" + nodeId + "/log.txt";
+            File file = new File(filename);
+            Store.log = new ArrayList<String>();
+            if (!file.exists()) {
+                return;
+            }
+
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+
+                while((line = br.readLine()) != null) {
+                    Store.log.add(line);
+                }
+            }
+            
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
+    }
+
 
     private static void saveCounter() {
         try {
-            String filename = "Nodes/" + nodeId + "/counter";
+            String filename = "Nodes/" + nodeId + "/counter.txt";
             
+            File file = new File(filename);
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }
+
+            PrintWriter out = new PrintWriter(filename);
+            out.println(Integer.toString(Store.counter));
+            out.close();
+
+            for(String node:Store.currentNodes) {
+                System.out.println(node);
+            }
+            /**
             File file = new File(filename);
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
@@ -204,7 +275,7 @@ public class Store implements RMIRemote {
             
             out.close();
             fileOut.close();
-
+            */
             Store.executor.shutdown();
 
         } catch (IOException i) {
@@ -215,8 +286,22 @@ public class Store implements RMIRemote {
     //loads this peer storage from a file called storage.ser if it exists
     private static void loadCounter() {
         try {
-            String filename = "Nodes/" + nodeId + "/counter";
+            String filename = "Nodes/" + nodeId + "/counter.txt";
 
+            File file = new File(filename);
+            if (!file.exists()) {
+                counter = -1;
+                return;
+            }
+            
+            Scanner sc = new Scanner(file);
+
+            Store.counter = Integer.parseInt(sc.nextLine());
+
+            sc.close();
+            
+            
+            /**
             File file = new File(filename);
             if (!file.exists()) {
                 counter = -1;
@@ -230,11 +315,10 @@ public class Store implements RMIRemote {
             
             in.close();
             fileIn.close();
+            */
 
         } catch (IOException i) {
             i.printStackTrace();
-        } catch (ClassNotFoundException c) {
-            c.printStackTrace();
         }
     }
 
@@ -244,8 +328,11 @@ public class Store implements RMIRemote {
 
         if(counterAux % 2 == 0) {
             Store.counter += 1;
+
+            Store.executor.execute(new MulticastChannel(mcastAddr, mcastPort));
+            System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
             
-            Store.executor.execute(new TCPChannel(Store.mcastPort));
+            Store.executor.execute(new Membership.TCPChannel(Store.mcastPort));
             
             System.out.println("> TCP Membership Channel Open on: " + Integer.toString(Store.mcastPort));
             
@@ -267,24 +354,6 @@ public class Store implements RMIRemote {
 
             Store.executor.execute(new SendMessage(message));
         }
-        
-    }
-
-    @Override
-    public void put(String key, String value) throws RemoteException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void get(String key) throws RemoteException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void delete(String key) throws RemoteException {
-        // TODO Auto-generated method stub
         
     }
 }
