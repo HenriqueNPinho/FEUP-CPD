@@ -1,5 +1,12 @@
 package Main;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.rmi.*;
 import java.rmi.registry.*;
 
@@ -8,6 +15,7 @@ import RMI.RMIRemote;
 public class TestClient {
     
     public static String nodeId;
+    public static int nodePort;
     public static String accessPoint;
     public static String operation;
     
@@ -15,7 +23,9 @@ public class TestClient {
         try {
             String[] nodeAp = args[0].split(":");
             nodeId = nodeAp[0];
+            nodePort = Integer.parseInt(nodeAp[1]);
             accessPoint = nodeAp[1];
+
             operation = args[1].toUpperCase();
 
             Registry registry;
@@ -27,83 +37,68 @@ public class TestClient {
                 case "JOIN":
                     node.join();
                     break;
+                    
                 case "LEAVE":
                     node.leave();
                     break;
-                
-                /**
-                 try (Socket socket = new Socket(nodeId, nodePort)) {
-                     
-                    OutputStream output = socket.getOutputStream();
-                    PrintWriter writer = new PrintWriter(output, true);
-                    
-                    writer.println(operation.toString());
-                    
-                } catch (UnknownHostException ex) {
-    
-                    System.out.println("Server not found: " + ex.getMessage());
-        
-                } catch (IOException ex) {
-        
-                    System.out.println("I/O error: " + ex.getMessage());
-                }*/
+
                 
                 case "PUT":
-                
-                
-                   
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                break;
-
-            case "GET":
-            
-            
-            
-
-            
-
-
-
-
-
-
-
-            
-            
-            
-
-            
-                break;
-
+                case "GET":
                 case "DELETE":
+                    
+                    String key = "";
+                    String value = "";
+                    
+                    try (Socket socket = new Socket(nodeId, nodePort)) {
                 
-                
+    
+                        OutputStream output = socket.getOutputStream();
+                        PrintWriter writer = new PrintWriter(output, true);
 
-                
+                        String message = operation + " " + key + " " + value;
+                        
+                        writer.println(message.toString());
 
-                
-                
-                
-                
+                        if(operation.equals("GET")) {
+                            InputStream input = socket.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+
+                            String response = reader.readLine();
+
+                            System.out.println(response);
+
+                            reader.close();
+                            input.close();
+
+                        }
+
+                        writer.close();
+                        output.close();
+                        socket.close();
+
+
+                    } catch (UnknownHostException ex) {
+        
+                        System.out.println("Server not found: " + ex.getMessage());
+            
+                    } catch (IOException ex) {
+            
+                        System.out.println("I/O error: " + ex.getMessage());
+                    }
+
                 break;
                 
                 default:
                 break;
             }
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NotBoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+            
+            } catch (RemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NotBoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
