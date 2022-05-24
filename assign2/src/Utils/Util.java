@@ -1,6 +1,7 @@
 package Utils;
 
 import java.io.*;
+import java.util.Scanner;
 
 public class Util {
     
@@ -20,5 +21,18 @@ public class Util {
         String[] nodeIdSplit = nodeId.split(".");
         int n = Integer.parseInt(nodeIdSplit[3]);
         return 3000+n;
+    }
+
+    public static String readFile(String path) throws IOException {
+
+        String s;
+        File file = new File(path);
+        Scanner reader = new Scanner(file);
+        s=reader.nextLine();
+       
+
+        reader.close();
+
+        return s;
     }
 }
