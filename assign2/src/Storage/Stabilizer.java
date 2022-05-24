@@ -28,5 +28,23 @@ public class Stabilizer implements Runnable {
 
         
     }
+
+    private String getSuccessor() {
+        String successor = "";
+        int distance = 999;
+        int hashId = hash(Store.nodeId);
+        for(String currentNodeId : Store.currentNodes) {
+            int currHashId = hash(currentNodeId);
+            if(currHashId > hashId) {
+                if(currHashId - hashId < distance) {
+                    successor = currentNodeId;                    
+                }
+            }
+        }
+        if(successor.equals("")) {
+            
+        }
+        return successor;
+    }
     
 }
