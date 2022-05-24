@@ -1,13 +1,8 @@
 package Utils;
 
 import java.io.*;
-<<<<<<< HEAD
-import java.security.*;
-import java.util.Scanner;
-=======
 import java.util.Scanner;
 
->>>>>>> 724038de066e563ab94c5abcf9342632a1227205
 public class Util {
     
     public static byte[] serialize(Object obj) throws IOException {
