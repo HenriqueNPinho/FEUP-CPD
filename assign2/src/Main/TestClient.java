@@ -1,6 +1,7 @@
 package Main;
 
 import java.io.BufferedReader;
+//import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +10,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.rmi.*;
 import java.rmi.registry.*;
+
+import Utils.*;
+import KVStorage.*;
 
 import RMI.RMIRemote;
 
@@ -55,10 +59,17 @@ public class TestClient {
     
                         OutputStream output = socket.getOutputStream();
                         PrintWriter writer = new PrintWriter(output, true);
-
+                        
                         String message = operation + " " + key + " " + value;
                         
                         writer.println(message.toString());
+                        String s=Util.readFile("../files.txt");
+
+                       
+                        if(operation.equals("PUT")) {
+                            key= Integer.toString(Crypt.hashString(s));
+                            value= s;
+                        }
 
                         if(operation.equals("GET")) {
                             InputStream input = socket.getInputStream();
@@ -93,11 +104,9 @@ public class TestClient {
                 break;
             }
             
-            } catch (RemoteException e) {
-                // TODO Auto-generated catch block
+            } catch (RemoteException e) {            
                 e.printStackTrace();
             } catch (NotBoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

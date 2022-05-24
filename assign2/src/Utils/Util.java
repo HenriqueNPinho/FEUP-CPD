@@ -1,8 +1,13 @@
 package Utils;
 
 import java.io.*;
+<<<<<<< HEAD
 import java.security.*;
 import java.util.Scanner;
+=======
+import java.util.Scanner;
+
+>>>>>>> 724038de066e563ab94c5abcf9342632a1227205
 public class Util {
     
     public static byte[] serialize(Object obj) throws IOException {
@@ -23,39 +28,16 @@ public class Util {
         return 3000+n;
     }
 
-    public static String hashData(String data) {
-        MessageDigest messageDigest;
-        try {
-            messageDigest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Failed to get algorithm instance.", e);
-        }
+    public static String readFile(String path) throws IOException {
 
-        messageDigest.update(data.getBytes());
-
-        return new String(messageDigest.digest());
-    }
-
-    public static String readFile(String path) {
-        String value = "";
-
+        String s;
         File file = new File(path);
-        if (!file.exists()) {
-            return value;
-        }
+        Scanner reader = new Scanner(file);
+        s=reader.nextLine();
+       
 
-        try (Scanner scanner = new Scanner(file)) {
-            
-            value = scanner.nextLine();
-            
-            
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        reader.close();
 
-
-        return value;
+        return s;
     }
-
 }
