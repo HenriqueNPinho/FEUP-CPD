@@ -2,8 +2,10 @@ package Storage;
 
 import java.io.*;
 import java.net.*;
-
+import KVStorage.*;
 import Main.Store;
+import Membership.SendMessage;
+
 
 public class ProtocolReceiver implements Runnable {
 
@@ -48,46 +50,26 @@ public class ProtocolReceiver implements Runnable {
         String operation = header[0];
         String key = header[1];
         
+        String node= getNode(key);
 
         switch (operation) {
+            
             case "PUT":
-                String value = header[2];
-                    
-
-                int distance = 0;
-                for(String node : Store.currentNodes) {
-                    int hashId = hash(node);
-                    int hashKey = hash(key);
-
-                    if(hashId >= hashKey) {
-                        
-                    }
+                String value = header[2];          
+                if(Store.nodeId.equals(node)){
+                    new HandleMessage(msg);
                 }
-
-
-
-
+                else{
+                    TCPChannel.sendMessage(node, 0, msg);
+                }
                 break;
 
             case "GET":
-
-
-
-
-
-
 
                 break;
 
 
             case "DELETE":               
-
-
-
-
-
-
-
 
                 break;
 
@@ -100,8 +82,38 @@ public class ProtocolReceiver implements Runnable {
         
     }
 
-    private int hash(String nodeId) {
-        return 0;
-    }
 
+    private String getNode(String key){
+
+        int distance = Integer.MAX_VALUE;
+        int lastDist=Integer.MAX_VALUE;
+        int hashId=0;
+        int hashKey=0;
+        for(String node : Store.currentNodes) {
+            hashId= Crypt.hashString(node)%360;
+            hashKey = Integer.parseInt(key)%360;
+
+            if(hashId >= hashKey) {
+                distance = hashId-hashKey;
+                distance=Integer.min(distance, lastDist);
+            }
+        }
+        hashId=distance+hashKey;
+        /// 
+        if(distance==Integer.MAX_VALUE){
+            for(String node : Store.currentNodes) {
+                hashId= Crypt.hashString(node)%360;
+                distance=Integer.min(hashId,distance);
+            }
+        }
+      
+        String thisNode="";
+        for(String node : Store.currentNodes){
+            if(Crypt.hashString(node)%360==hashId){
+                thisNode=node;
+            }
+        }
+
+        return thisNode;
+    }
 }

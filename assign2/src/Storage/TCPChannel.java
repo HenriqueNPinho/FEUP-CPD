@@ -2,7 +2,7 @@ package Storage;
 
 import java.io.*;
 import java.net.*;
-
+import KVStorage.*;
 import Main.Store;
 
 public class TCPChannel implements Runnable {
@@ -13,7 +13,7 @@ public class TCPChannel implements Runnable {
         this.port = port;
     }
 
-    public String sendMessage(String nodeId, int nodePort, String message) {
+    public static String sendMessage(String nodeId, int nodePort, String message) {
         String response = "";
         try (Socket socket = new Socket(nodeId, nodePort)) {
             OutputStream output = socket.getOutputStream();
@@ -88,7 +88,7 @@ public class TCPChannel implements Runnable {
 
         switch (msgSplit[0]) {
             case "PUT":
-
+ 
                 
                 break;
         
