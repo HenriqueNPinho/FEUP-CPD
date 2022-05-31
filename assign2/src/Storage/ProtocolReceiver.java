@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import KVStorage.*;
 import Main.Store;
+import Membership.SendMessage;
+
 
 public class ProtocolReceiver implements Runnable {
 
@@ -54,7 +56,12 @@ public class ProtocolReceiver implements Runnable {
             
             case "PUT":
                 String value = header[2];          
-
+                if(Store.nodeId.equals(node)){
+                    new HandleMessage(msg);
+                }
+                else{
+                    TCPChannel.sendMessage(node, 0, msg);
+                }
                 break;
 
             case "GET":
@@ -74,6 +81,7 @@ public class ProtocolReceiver implements Runnable {
 
         
     }
+
 
     private String getNode(String key){
 

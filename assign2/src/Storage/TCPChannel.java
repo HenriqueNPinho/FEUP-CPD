@@ -13,7 +13,7 @@ public class TCPChannel implements Runnable {
         this.port = port;
     }
 
-    public String sendMessage(String nodeId, int nodePort, String message) {
+    public static String sendMessage(String nodeId, int nodePort, String message) {
         String response = "";
         try (Socket socket = new Socket(nodeId, nodePort)) {
             OutputStream output = socket.getOutputStream();

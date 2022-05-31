@@ -15,7 +15,6 @@ public class HandleMessage {
             proceesMsg(msgSplit[0], msgSplit[1]);
         }
 
-
     }
 
 
