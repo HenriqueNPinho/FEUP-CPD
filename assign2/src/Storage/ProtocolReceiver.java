@@ -99,6 +99,14 @@ public class ProtocolReceiver implements Runnable {
             }
         }
         hashId=distance+hashKey;
+        /// 
+        if(distance==Integer.MAX_VALUE){
+            for(String node : Store.currentNodes) {
+                hashId= Crypt.hashString(node)%360;
+                distance=Integer.min(hashId,distance);
+            }
+        }
+      
         String thisNode="";
         for(String node : Store.currentNodes){
             if(Crypt.hashString(node)%360==hashId){
