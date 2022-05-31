@@ -89,7 +89,6 @@ public class TCPChannel implements Runnable {
                     }    
                 
                 } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
 
@@ -101,7 +100,6 @@ public class TCPChannel implements Runnable {
             serverSocket.close();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             System.out.println("TCP");
         }

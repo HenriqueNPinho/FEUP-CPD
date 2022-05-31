@@ -55,10 +55,8 @@ public class Store implements RMIRemote {
             registry.bind(accessPoint, stub);
 
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (AlreadyBoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

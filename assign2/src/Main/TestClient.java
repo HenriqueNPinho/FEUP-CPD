@@ -51,27 +51,30 @@ public class TestClient {
                 case "GET":
                 case "DELETE":
                     
-                    String key = "";
-                    String value = "";
-                    
                     try (Socket socket = new Socket(nodeId, nodePort)) {
                 
     
                         OutputStream output = socket.getOutputStream();
                         PrintWriter writer = new PrintWriter(output, true);
                         
-                        String message = operation + " " + key + " " + value;
                         
-                        writer.println(message.toString());
-                        String s=Util.readFile("../files.txt");
-
-                       
                         if(operation.equals("PUT")) {
-                            key= Integer.toString(Crypt.hashString(s));
-                            value= s;
+                            String s = Util.readFile(args[2]);
+                            String key= Integer.toString(Crypt.hashString(s));
+                            String value= s;
+                            String message = operation + " " + key + " " + value;
+
+                            System.out.println(key);
+                        
+                            writer.println(message.toString());
                         }
 
-                        if(operation.equals("GET")) {
+                        else if(operation.equals("GET")) {
+                            String key = args[2];
+                            String message = operation + " " + key;
+                        
+                            writer.println(message.toString());
+                           
                             InputStream input = socket.getInputStream();
                             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
@@ -82,6 +85,14 @@ public class TestClient {
                             reader.close();
                             input.close();
 
+                        }
+                       
+
+                        else if(operation.equals("DELETE")) {
+                            String key = args[2];
+                            String message = operation + " " + key;
+                        
+                            writer.println(message.toString());
                         }
 
                         writer.close();

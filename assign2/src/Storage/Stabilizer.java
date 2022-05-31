@@ -2,6 +2,7 @@ package Storage;
 
 import java.util.ArrayList;
 
+import KVStorage.Crypt;
 import Main.Store;
 
 public class Stabilizer implements Runnable {
@@ -32,17 +33,15 @@ public class Stabilizer implements Runnable {
     private String getSuccessor() {
         String successor = "";
         int distance = 999;
-        int hashId = hash(Store.nodeId);
+        int hashId = Crypt.hashString(Store.nodeId)%360;
         for(String currentNodeId : Store.currentNodes) {
-            int currHashId = hash(currentNodeId);
-            if(currHashId > hashId) {
-                if(currHashId - hashId < distance) {
-                    successor = currentNodeId;                    
-                }
+            int currHashId = Crypt.hashString(currentNodeId)%360;
+            if (currHashId < hashId) 
+                currHashId = currHashId+360; 
+            if(currHashId - hashId < distance) {
+                successor = currentNodeId;                 
             }
-        }
-        if(successor.equals("")) {
-            
+        
         }
         return successor;
     }
