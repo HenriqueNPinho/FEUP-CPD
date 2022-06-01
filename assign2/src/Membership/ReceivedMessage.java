@@ -36,7 +36,7 @@ public class ReceivedMessage implements Runnable{
                     
                     Store.addToLog(recentEvents);
 
-                    Store.printLog();
+                    //Store.printLog();
 
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block

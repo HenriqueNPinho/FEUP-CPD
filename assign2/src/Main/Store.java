@@ -62,22 +62,27 @@ public class Store implements RMIRemote {
 
         sentClusterInfo = new ArrayList<>();
         currentNodes = new ArrayList<>();
+        bucket =  new Bucket();
 
         int cores = Runtime.getRuntime().availableProcessors();
         executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(cores);
 
         loadCounter();
-
-        System.out.println(Store.counter);
-
-        executor.execute(new ProtocolReceiver(storePort));
-        System.out.println(" > TCP Potocol Channel Open on: " + Integer.toString(storePort));
+        loadLog();
 
         if(isMember()) {
+
+            executor.execute(new ProtocolReceiver(storePort));
+            System.out.println(" > TCP Potocol Channel Open on: " + Integer.toString(storePort));
+
+            executor.execute(new MulticastChannel(mcastAddr, mcastPort));
+            System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
+            
+            //Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 1, 1, TimeUnit.SECONDS);
+
+            //executor.execute(new TCPChannel(mcastPort));
+            //System.out.println("> Storage TCP Channel Open on: " + Integer.toString(mcastPort));
         }
-        loadLog();
-        executor.execute(new MulticastChannel(mcastAddr, mcastPort));
-        System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
         
 
         //executor.scheduleAtFixedRate(new SetCurrentNodes(), 0, 1, TimeUnit.SECONDS);
@@ -86,8 +91,8 @@ public class Store implements RMIRemote {
         //executor.scheduleWithFixedDelay(new CastMembershipInfo(mcastAddr, mcastPort,"CASTING...."), 5, 1, TimeUnit.SECONDS);
     
         
-        Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
-        Runtime.getRuntime().addShutdownHook(new Thread(Store::saveLog));
+        //Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
+        //Runtime.getRuntime().addShutdownHook(new Thread(Store::saveLog));
     }
 
     public static boolean isMember() {
@@ -328,7 +333,7 @@ public class Store implements RMIRemote {
             Store.counter += 1;
 
             Store.executor.execute(new MulticastChannel(mcastAddr, mcastPort));
-            System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
+            System.out.println("> MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
             
             Store.executor.execute(new Membership.TCPChannel(Store.mcastPort));
             
@@ -352,6 +357,12 @@ public class Store implements RMIRemote {
 
             Store.executor.execute(new SendMessage(message));
         }
+        
+    }
+
+    @Override
+    public void printStorage() {
+        Store.bucket.printBucket();
         
     }
 }

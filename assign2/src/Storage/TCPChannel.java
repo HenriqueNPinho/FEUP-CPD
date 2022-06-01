@@ -68,15 +68,14 @@ public class TCPChannel implements Runnable {
 
                 processMessage(message);
 
+                
                 objectInputStream.close();
                 input.close();
                 socket.close();
                 serverSocket.close();
-
-            
-        
+                
+                
             } catch (IOException | ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

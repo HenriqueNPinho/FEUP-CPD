@@ -9,16 +9,16 @@ public class HandleMessage {
         String[] msgSplit = message.trim().split(" ");
 
         if(msgSplit.length == 3) {
-            proceesMsg(msgSplit[0], msgSplit[1], msgSplit[2]);
+            processMsg(msgSplit[0], msgSplit[1], msgSplit[2]);
         }
         else {
-            proceesMsg(msgSplit[0], msgSplit[1]);
+            processMsg(msgSplit[0], msgSplit[1]);
         }
 
     }
 
 
-    private void proceesMsg(String operation, String key) {
+    private void processMsg(String operation, String key) {
         switch (operation) {
             case "DELETE":
                 Store.bucket.deleteKeyValue(key);
@@ -26,7 +26,7 @@ public class HandleMessage {
             
             case "GET":
                 String value = Store.bucket.getValue(key);
-                
+                System.out.println(value);
                 break;
         
             default:
@@ -34,9 +34,8 @@ public class HandleMessage {
         }
     }
 
-    private void proceesMsg(String operation, String key, String value) {
+    private void processMsg(String operation, String key, String value) {
         Store.bucket.addKeyValue(key, value);
     }
 
-    
 }

@@ -46,6 +46,10 @@ public class TestClient {
                     node.leave();
                     break;
 
+                case "PRINTSTORAGE":
+                    node.printStorage();
+                    break;
+
                 
                 case "PUT":
                 case "GET":
@@ -109,7 +113,7 @@ public class TestClient {
                         System.out.println("I/O error: " + ex.getMessage());
                     }
 
-                break;
+                    break;
                 
                 default:
                 break;

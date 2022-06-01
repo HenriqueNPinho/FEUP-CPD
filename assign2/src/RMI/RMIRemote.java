@@ -6,4 +6,5 @@ import java.rmi.RemoteException;
 public interface RMIRemote extends Remote {
     void join() throws RemoteException;
     void leave() throws RemoteException;
+    void printStorage() throws RemoteException;
 }
