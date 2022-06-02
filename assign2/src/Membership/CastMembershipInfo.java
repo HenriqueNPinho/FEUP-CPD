@@ -29,10 +29,10 @@ public class CastMembershipInfo implements Runnable {
     @Override
     public void run() {
 
-        
-            while(Store.isMember()) {
 
-                try (DatagramSocket sender = new DatagramSocket()) {
+        
+        try (DatagramSocket sender = new DatagramSocket()) {
+                if(Store.isMember()) {
                     
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -50,16 +50,16 @@ public class CastMembershipInfo implements Runnable {
         
                     sender.send(packet);
         
+                    
                     oos.close();
                     baos.close();
-                    sender.close();
-                
-                
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
+                    
+                sender.close();
+                
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        
     }
     
 }

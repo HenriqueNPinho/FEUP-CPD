@@ -29,7 +29,7 @@ public class SendMessage implements Runnable {
 
         switch (header) {
             case "JOIN":
-            case "LEAVE":
+            case "LEAVE": 
                 
                 MulticastChannel.sendMessage(msg.getBytes());
 

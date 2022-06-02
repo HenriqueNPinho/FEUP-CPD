@@ -2,7 +2,8 @@ package Storage;
 
 import java.io.*;
 import java.net.*;
-import KVStorage.*;
+import java.util.ArrayList;
+
 import Main.Store;
 import Utils.Util;
 
@@ -14,21 +15,14 @@ public class ProtocolReceiver implements Runnable {
         this.port = port;
     }   
 
-    public void sendMessage(String nodeId, int nodePort, String msg) {
+    public static void sendMessage(String nodeId, int nodePort, Object msg) {
         
         try(Socket socket = new Socket(nodeId, nodePort)) {
 
-
             OutputStream output = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(output, true);
-
-            writer.println(msg.toString());
-
-            writer.close();
-            output.close();
-            socket.close();
-
-
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(output);
+            
+            objectOutputStream.writeObject(msg);
             
         } catch (UnknownHostException ex) {
         
@@ -43,25 +37,46 @@ public class ProtocolReceiver implements Runnable {
     @Override
     public void run() {
         
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        while(Store.isMember()) {
+            try (ServerSocket serverSocket = new ServerSocket(port)) {
 
-            while(Store.isMember()) {
+                serverSocket.setSoTimeout(1000);
+                
                 Socket socket = serverSocket.accept();
 
                 InputStream input = socket.getInputStream();
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-                
-                String message = reader.readLine();
 
-                processMessage(message);
+                ObjectInputStream objectInputStream = new ObjectInputStream(input);
+
+                try {
+                    
+                    Object objectReceived = objectInputStream.readObject();
+
+                    if(objectReceived instanceof String) {
+                        String message = (String) objectReceived;
+                        processMessage(message);
+                        
+                    }   
+                    else if (objectReceived instanceof ArrayList) {
+                        ArrayList<String> kvs = (ArrayList<String>)objectReceived;
+                        Store.bucket.addKeysValues(kvs);
+                    } 
+                
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                serverSocket.close();
+            } catch (SocketTimeoutException e) {
+                
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } 
 
             }
-        
             
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
                
     }
 
@@ -76,16 +91,15 @@ public class ProtocolReceiver implements Runnable {
 
         if(node.equals("")) 
             node = Store.nodeId;
+
+        int port = Util.getNodePort(node);
         
         if(Store.nodeId.equals(node)){
             new HandleMessage(msg);
         }
         else{
-            sendMessage(node, Util.getNodePort(node), msg);
-            
+            ProtocolReceiver.sendMessage(node, port, msg);
         }
-        
-        //new HandleMessage(msg);
         
     }
 
@@ -97,12 +111,15 @@ public class ProtocolReceiver implements Runnable {
         int hashId=0;
         int hashKey=0;
         for(String node : Store.currentNodes) {
-            hashId= Crypt.hashString(node)%360;
+            hashId= Util.hashString(node)%360;
+            System.out.println(node + ": "+hashId);
             hashKey = Integer.parseInt(key)%360;
+            System.out.println(hashKey);
 
             if(hashId >= hashKey) {
                 distance = hashId-hashKey;
                 distance=Integer.min(distance, lastDist);
+                lastDist = distance;
             }
         }
         
@@ -110,14 +127,14 @@ public class ProtocolReceiver implements Runnable {
         /// 
         if(distance==Integer.MAX_VALUE){
             for(String node : Store.currentNodes) {
-                hashId= Crypt.hashString(node)%360;
+                hashId= Util.hashString(node)%360;
                 distance=Integer.min(hashId,distance);
             }
         }
         
         String thisNode="";
         for(String node : Store.currentNodes){
-            if(Crypt.hashString(node)%360==hashId){
+            if(Util.hashString(node)%360==hashId){
                 thisNode=node;
             }
         }

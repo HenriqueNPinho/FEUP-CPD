@@ -85,7 +85,6 @@ public class ReceivedMessage implements Runnable{
                     Store.addLogEntry(nodeId_, nodeCounter_);
                     Store.printLog();
                 }
-
             
             default:
                 break;

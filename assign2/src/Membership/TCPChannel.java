@@ -53,8 +53,8 @@ public class TCPChannel implements Runnable {
 
     @Override
     public void run() {
-        while(this.counter < 3) {
-            try (ServerSocket serverSocket = new ServerSocket(this.port)) {
+        try (ServerSocket serverSocket = new ServerSocket(this.port)) {
+                while(this.counter < 3) {
 
                     serverSocket.setSoTimeout(3000);
     
@@ -88,13 +88,13 @@ public class TCPChannel implements Runnable {
     
                     this.counter++;
                     
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("TCP");
             }
-        }
 
-        if(counter > 0 && counter < 3) {
+        if(counter < 2) {
             
             String msg = "JOIN "+Store.nodeId+" "+Integer.toString(Store.mcastPort)+" "+Integer.toString(Store.counter)+"\r\n\r\n";
             Store.executor.execute(new SendMessage(msg));
@@ -103,9 +103,10 @@ public class TCPChannel implements Runnable {
         if(counter > 2) {
             Store.executor.execute(new ProtocolReceiver(Store.storePort));
             System.out.println("> TCP Potocol Channel Open on: " + Integer.toString(Store.storePort));
-            //Store.executor.execute(new Storage.TCPChannel(this.port));
-            //System.out.println("> Storage TCP Channel Open on: " + Integer.toString(this.port));
-            //Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 1, 1, TimeUnit.SECONDS);
+            
+            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 10, 1, TimeUnit.SECONDS);
+            
+            Store.executor.scheduleWithFixedDelay(new SetCurrentNodes(), 1, 20, TimeUnit.SECONDS);
 
         }
             

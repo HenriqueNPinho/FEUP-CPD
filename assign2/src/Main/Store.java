@@ -10,6 +10,7 @@ import java.util.concurrent.*;
 import Membership.*;
 import RMI.RMIRemote;
 import Storage.*;
+import Utils.Util;
 
 public class Store implements RMIRemote {
 
@@ -77,8 +78,10 @@ public class Store implements RMIRemote {
 
             executor.execute(new MulticastChannel(mcastAddr, mcastPort));
             System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
+
+            executor.scheduleWithFixedDelay(new SetCurrentNodes(), 1, 20, TimeUnit.SECONDS);
             
-            //Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 1, 1, TimeUnit.SECONDS);
+            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 1, 20, TimeUnit.SECONDS);
 
             //executor.execute(new TCPChannel(mcastPort));
             //System.out.println("> Storage TCP Channel Open on: " + Integer.toString(mcastPort));
@@ -145,8 +148,6 @@ public class Store implements RMIRemote {
             log.add(log.size(), logs.get(i));
             
         }
-
-
         
     }
 
@@ -216,7 +217,6 @@ public class Store implements RMIRemote {
 
             out.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -239,10 +239,8 @@ public class Store implements RMIRemote {
             }
             
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } 
     }
@@ -265,20 +263,7 @@ public class Store implements RMIRemote {
             for(String node:Store.currentNodes) {
                 System.out.println(node);
             }
-            /**
-            File file = new File(filename);
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            }
-
-            FileOutputStream fileOut = new FileOutputStream(filename);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(counter);
             
-            out.close();
-            fileOut.close();
-            */
             Store.executor.shutdown();
 
         } catch (IOException i) {
@@ -286,7 +271,6 @@ public class Store implements RMIRemote {
         }
     }
 
-    //loads this peer storage from a file called storage.ser if it exists
     private static void loadCounter() {
         try {
             String filename = "Nodes/" + nodeId + "/counter.txt";
@@ -302,23 +286,6 @@ public class Store implements RMIRemote {
             Store.counter = Integer.parseInt(sc.nextLine());
 
             sc.close();
-            
-            
-            /**
-            File file = new File(filename);
-            if (!file.exists()) {
-                counter = -1;
-                return;
-            }
-
-            FileInputStream fileIn = new FileInputStream(filename);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            
-            counter = (Integer) in.readObject();
-            
-            in.close();
-            fileIn.close();
-            */
 
         } catch (IOException i) {
             i.printStackTrace();
@@ -352,6 +319,12 @@ public class Store implements RMIRemote {
                 
         if(counterAux2 % 2 != 0) {
             Store.counter += 1;
+
+            String successor = Util.getSuccesor();
+            System.out.println(successor);
+
+            ProtocolReceiver.sendMessage(successor, Util.getNodePort(successor), Store.bucket.getKeysValues());
+            Store.bucket.deleteAll();
 
             String message = "LEAVE " + Store.nodeId + " " + Integer.toString(Store.mcastPort) + " " + Integer.toString(Store.counter) + "\r\n\r\n";
 

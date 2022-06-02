@@ -18,7 +18,6 @@ public class MulticastChannel implements Runnable {
             port = portN;
 
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -52,7 +51,7 @@ public class MulticastChannel implements Runnable {
 
                 multicastSocket.receive(packet);
 
-                byte[] bufferCopy = Arrays.copyOf(buf, packet.getLength());                
+                byte[] bufferCopy = Arrays.copyOf(buf, packet.getLength());            
 
                 Store.executor.execute(new ReceivedMessage(bufferCopy));
                 
@@ -60,7 +59,6 @@ public class MulticastChannel implements Runnable {
         
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         

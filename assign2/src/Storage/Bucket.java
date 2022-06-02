@@ -1,7 +1,10 @@
 package Storage;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+
+import Main.Store;
 
 public class Bucket {
 
@@ -43,6 +46,10 @@ public class Bucket {
         return;
     }
 
+    public void deleteAll() {
+        keyValue.removeAll(keyValue);
+    }
+
     public ArrayList<String> getKeysValues() {
         return keyValue;
     }
@@ -60,6 +67,54 @@ public class Bucket {
             System.out.println(kv);
         }
         return;
+    }
+
+    public void saveBucket() {
+        try {
+            String filename = "Nodes/" + Store.nodeId + "/bucket.txt";
+            File file = new File(filename);
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }
+            
+            PrintWriter out = new PrintWriter(filename);
+
+            for(String kv : keyValue) {
+                out.println(kv);
+            }
+
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void loadBucket() {
+        try {
+            String filename = "Nodes/" + Store.nodeId + "/bucket.txt";
+            File file = new File(filename);
+            keyValue = new ArrayList<>();
+            if (!file.exists()) {
+                return;
+            }
+
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+
+                while((line = br.readLine()) != null) {
+                    keyValue.add(line);
+                }
+            }
+            
+        } catch (FileNotFoundException e) {
+            
+            e.printStackTrace();
+        } catch (IOException e) {
+            
+            e.printStackTrace();
+        } 
     }
     
 }
