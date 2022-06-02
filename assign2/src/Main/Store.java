@@ -79,9 +79,11 @@ public class Store implements RMIRemote {
             executor.execute(new MulticastChannel(mcastAddr, mcastPort));
             System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
 
-            executor.scheduleWithFixedDelay(new SetCurrentNodes(), 1, 20, TimeUnit.SECONDS);
+            executor.scheduleWithFixedDelay(new SetCurrentNodes(), 1, 10, TimeUnit.SECONDS);
             
-            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 1, 20, TimeUnit.SECONDS);
+            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 3, 1, TimeUnit.SECONDS);
+
+            Store.executor.scheduleWithFixedDelay(new Stabilizer(), 10, 5, TimeUnit.SECONDS);
 
             //executor.execute(new TCPChannel(mcastPort));
             //System.out.println("> Storage TCP Channel Open on: " + Integer.toString(mcastPort));

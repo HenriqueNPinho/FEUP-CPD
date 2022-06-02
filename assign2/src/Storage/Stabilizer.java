@@ -9,76 +9,36 @@ public class Stabilizer implements Runnable {
 
     @Override
     public void run() {
-        
-        ArrayList<String> keyValues = Store.bucket.getKeysValues();
-        ArrayList<String> currentNodes = Store.currentNodes;
+        if(Store.isMember()) {
+            
+            int currD = Util.hashString(Store.nodeId) % 360;
+            for(String node : Store.currentNodes) {
+                
+                if(node.equals(Store.nodeId))
+                    continue;
+                int nextD = Util.hashString(node) % 360;
 
-        for(String node : currentNodes) {
-            ArrayList<String> keysValuesToSend = new ArrayList<>();
-            for(String kv : keyValues) {
-                if(true) {
-                    keysValuesToSend.add(kv);
-                    Store.bucket.deleteKeyValue(kv.split("-")[0]);
+                ArrayList<String> keysValuesToSend = new ArrayList<>();
+ 
+                for(String kv : Store.bucket.getKeysValues()) {
+                    String key = kv.split("-")[0];
+                    int kvD = Util.hashString(key) % 360;
+ 
+                    if(nextD - kvD < currD - kvD) {
+                        keysValuesToSend.add(kv);
+                    }
+                }
+                if(keysValuesToSend.size() > 0) {
+                    for(String kv : keysValuesToSend) {
+                        String k = kv.split("-")[0];
+                        Store.bucket.deleteKeyValue(k);
+                    }
+                    ProtocolReceiver.sendMessage(node, Util.getNodePort(node), keysValuesToSend);
+                    System.out.println("> Key-Value sent to node: " + node);
+                    return;
                 }
             }
-            if(keysValuesToSend.size() > 0) {
-                // SEND TO NODE
-            }
         }
+        return;
     }
-
-    private String getSuccesor() {
-        String successor = "";
-        int distance = 999;
-        int hashId = Util.hashString(Store.nodeId)%360;
-        for(String currentNodeId : Store.currentNodes) {
-            int currHashId = Util.hashString(currentNodeId)%360;
-            if (currHashId < hashId) 
-                currHashId = currHashId+(360-hashId);
-            if(currHashId - hashId < distance) {
-                successor = currentNodeId;
-                distance = currHashId - hashId;
-            }
-        }
-        return successor;
-    }
-
-    private String getSuccessor(String key){
-
-        int distance = Integer.MAX_VALUE;
-        int lastDist=Integer.MAX_VALUE;
-        int hashId=0;
-        int hashKey=0;
-        for(String node : Store.currentNodes) {
-            hashId= Util.hashString(node)%360;
-            System.out.println(node + ": "+hashId);
-            hashKey = Integer.parseInt(key)%360;
-            System.out.println(hashKey);
-
-            if(hashId >= hashKey) {
-                distance = hashId-hashKey;
-                distance=Integer.min(distance, lastDist);
-                lastDist = distance;
-            }
-        }
-        
-        hashId=distance+hashKey;
-        /// 
-        if(distance==Integer.MAX_VALUE){
-            for(String node : Store.currentNodes) {
-                hashId= Util.hashString(node)%360;
-                distance=Integer.min(hashId,distance);
-            }
-        }
-        
-        String thisNode="";
-        for(String node : Store.currentNodes){
-            if(Util.hashString(node)%360==hashId){
-                thisNode=node;
-            }
-        }
-
-        return thisNode;
-    }
-    
 }

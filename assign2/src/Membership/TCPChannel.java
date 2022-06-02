@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import Main.Store;
 import Storage.ProtocolReceiver;
+import Storage.Stabilizer;
 
 public class TCPChannel implements Runnable {
 
@@ -106,7 +107,9 @@ public class TCPChannel implements Runnable {
             
             Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 10, 1, TimeUnit.SECONDS);
             
-            Store.executor.scheduleWithFixedDelay(new SetCurrentNodes(), 1, 20, TimeUnit.SECONDS);
+            Store.executor.scheduleWithFixedDelay(new SetCurrentNodes(), 1, 10, TimeUnit.SECONDS);
+
+            Store.executor.scheduleWithFixedDelay(new Stabilizer(), 1, 5, TimeUnit.SECONDS);
 
         }
             

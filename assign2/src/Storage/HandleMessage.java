@@ -21,12 +21,13 @@ public class HandleMessage {
     private void processMsg(String operation, String key) {
         switch (operation) {
             case "DELETE":
-                Store.bucket.deleteKeyValue(key);
+                String kv = Store.bucket.deleteKeyValue(key);
+                System.out.println("> Key-Value deleted: " + kv);
                 break;
             
             case "GET":
                 String value = Store.bucket.getValue(key);
-                System.out.println(value);
+                System.out.println("> Value: " + value);
                 break;
         
             default:
@@ -36,6 +37,7 @@ public class HandleMessage {
 
     private void processMsg(String operation, String key, String value) {
         Store.bucket.addKeyValue(key, value);
+        System.out.println("> Key-Value added: " + key + "-" + value);
     }
 
 }

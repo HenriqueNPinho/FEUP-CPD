@@ -35,15 +35,16 @@ public class Bucket {
         return;
     }
 
-    public void deleteKeyValue(String key) {
+    public String deleteKeyValue(String key) {
         for(String kv : keyValue) {
             String k = kv.split("-")[0];
             if(k.equals(key)) {
                 keyValue.remove(kv);
-                return;
+                
+                return kv;
             }
         }
-        return;
+        return "not found";
     }
 
     public void deleteAll() {
