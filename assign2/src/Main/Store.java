@@ -86,8 +86,8 @@ public class Store implements RMIRemote {
             Store.executor.scheduleWithFixedDelay(new Stabilizer(), 10, 5, TimeUnit.SECONDS);
         }
         
-        //Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
-        //Runtime.getRuntime().addShutdownHook(new Thread(Store::saveLog));
+        Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
+        Runtime.getRuntime().addShutdownHook(new Thread(Store::saveLog));
     }
 
     public static boolean isMember() {

@@ -74,7 +74,7 @@ public class ReceivedMessage implements Runnable{
             case "LEAVE":
 
                 String nodeId_ = headerInfo[1];
-                String nodePort_ = headerInfo[2];
+                //String nodePort_ = headerInfo[2];
                 String nodeCounter_ = headerInfo[3];
 
 

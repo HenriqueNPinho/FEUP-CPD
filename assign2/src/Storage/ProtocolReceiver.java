@@ -85,7 +85,7 @@ public class ProtocolReceiver implements Runnable {
     private void processMessage(String msg) {
 
         String[] header = msg.trim().split(" ");
-        String operation = header[0];
+        //String operation = header[0];
         String key = header[1];
         
         String node = getNode(key);

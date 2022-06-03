@@ -2,7 +2,6 @@ package Storage;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 import Main.Store;
 
@@ -10,11 +9,8 @@ public class Bucket {
 
     private ArrayList<String> keyValue; //key-value
 
-    private ConcurrentHashMap<String, Integer> storedOccurrences;
-
     public Bucket() {
         keyValue = new ArrayList<>();
-        storedOccurrences = new ConcurrentHashMap<>();
     }
 
 
