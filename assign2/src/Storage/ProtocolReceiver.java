@@ -100,6 +100,7 @@ public class ProtocolReceiver implements Runnable {
         }
         else{
             ProtocolReceiver.sendMessage(node, port, msg);
+            System.out.println("> Key-value sent to: " + node);
         }
         
     }

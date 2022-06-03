@@ -32,7 +32,7 @@ public class SetCurrentNodes implements Runnable {
                     }
                 }
             }   
-            System.out.println("> Current nodes updated");
+            //System.out.println("> Current nodes updated");
         }
     }
     
