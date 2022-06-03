@@ -49,9 +49,6 @@ public class TCPChannel implements Runnable {
 
     }
 
-
-
-
     @Override
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(this.port)) {
@@ -112,7 +109,6 @@ public class TCPChannel implements Runnable {
             Store.executor.scheduleWithFixedDelay(new Stabilizer(), 1, 5, TimeUnit.SECONDS);
 
         }
-            
         
     }
     

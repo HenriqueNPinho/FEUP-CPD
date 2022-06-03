@@ -29,20 +29,13 @@ public class SendMessage implements Runnable {
 
         switch (header) {
             case "JOIN":
-            case "LEAVE": 
+            case "LEAVE":
                 
-                MulticastChannel.sendMessage(msg.getBytes());
-
-                // MEMBERSHIP WITH THE MOST RECENT LOGS
-
-                //Store.mcChannel.sendMessage(msg);
-
-            
+                MulticastChannel.sendMessage(msg.getBytes());            
                 
                 break;
 
             case "MEMBERSHIP":
-
             
                 TCPChannel.sendMessage(nodeId, nodePort, membershipInfo);
 

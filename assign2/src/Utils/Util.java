@@ -26,7 +26,6 @@ public class Util {
     public static int getNodePort(String nodeId) {
         String[] nodeIdSplit = nodeId.split("\\.");
         int n = Integer.parseInt(nodeIdSplit[3]);
-        System.out.println(3000+n);
         return 3000+n;
     }
 
@@ -57,7 +56,6 @@ public class Util {
                 successor = currentNodeId;
                 distance = currHashId - hashId;
             }
-            System.out.println(successor);
         }
         return successor;
     }

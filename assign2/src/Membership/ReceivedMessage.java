@@ -39,10 +39,8 @@ public class ReceivedMessage implements Runnable{
                     //Store.printLog();
 
                 } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 
@@ -85,6 +83,8 @@ public class ReceivedMessage implements Runnable{
                     Store.addLogEntry(nodeId_, nodeCounter_);
                     Store.printLog();
                 }
+
+                break;
             
             default:
                 break;

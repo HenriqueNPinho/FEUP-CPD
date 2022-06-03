@@ -17,7 +17,6 @@ public class HandleMessage {
 
     }
 
-
     private void processMsg(String operation, String key) {
         switch (operation) {
             case "DELETE":
@@ -38,6 +37,7 @@ public class HandleMessage {
     private void processMsg(String operation, String key, String value) {
         Store.bucket.addKeyValue(key, value);
         System.out.println("> Key-Value added: " + key + "-" + value);
+        
     }
 
 }

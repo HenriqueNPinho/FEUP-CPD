@@ -12,8 +12,6 @@ public class Bucket {
 
     private ConcurrentHashMap<String, Integer> storedOccurrences;
 
-
-
     public Bucket() {
         keyValue = new ArrayList<>();
         storedOccurrences = new ConcurrentHashMap<>();
@@ -27,7 +25,7 @@ public class Bucket {
                 return key_value[1];
             }
         }
-        return null;
+        return "";
     }
 
     public void addKeyValue(String key, String value) {

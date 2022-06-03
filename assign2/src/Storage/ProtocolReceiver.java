@@ -61,6 +61,7 @@ public class ProtocolReceiver implements Runnable {
                     else if (objectReceived instanceof ArrayList) {
                         ArrayList<String> kvs = (ArrayList<String>)objectReceived;
                         Store.bucket.addKeysValues(kvs);
+                        System.out.println("> Key-value receivied from other node");
                     } 
                 
                 } catch (ClassNotFoundException e) {
@@ -87,7 +88,8 @@ public class ProtocolReceiver implements Runnable {
         String operation = header[0];
         String key = header[1];
         
-        String node= getNode(key);
+        String node = getNode(key);
+        System.out.println("NODE: " + node);
 
         if(node.equals("")) 
             node = Store.nodeId;
@@ -129,6 +131,7 @@ public class ProtocolReceiver implements Runnable {
             for(String node : Store.currentNodes) {
                 hashId= Util.hashString(node)%360;
                 distance=Integer.min(hashId,distance);
+                hashId = distance;
             }
         }
         

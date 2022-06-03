@@ -84,17 +84,7 @@ public class Store implements RMIRemote {
             Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 3, 1, TimeUnit.SECONDS);
 
             Store.executor.scheduleWithFixedDelay(new Stabilizer(), 10, 5, TimeUnit.SECONDS);
-
-            //executor.execute(new TCPChannel(mcastPort));
-            //System.out.println("> Storage TCP Channel Open on: " + Integer.toString(mcastPort));
         }
-        
-
-        //executor.scheduleAtFixedRate(new SetCurrentNodes(), 0, 1, TimeUnit.SECONDS);
-
-
-        //executor.scheduleWithFixedDelay(new CastMembershipInfo(mcastAddr, mcastPort,"CASTING...."), 5, 1, TimeUnit.SECONDS);
-    
         
         //Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
         //Runtime.getRuntime().addShutdownHook(new Thread(Store::saveLog));
@@ -173,11 +163,8 @@ public class Store implements RMIRemote {
             i = logSize - 32;
         }
 
-        int j = 0;
-
         for(; i < log.size(); i++) {
             logs.add(log.get(i));
-            j++;
         }
 
         return logs;
@@ -323,7 +310,7 @@ public class Store implements RMIRemote {
             Store.counter += 1;
 
             String successor = Util.getSuccesor();
-            System.out.println(successor);
+            System.out.println("> Successor: " + successor);
 
             ProtocolReceiver.sendMessage(successor, Util.getNodePort(successor), Store.bucket.getKeysValues());
             Store.bucket.deleteAll();
@@ -338,6 +325,12 @@ public class Store implements RMIRemote {
     @Override
     public void printStorage() {
         Store.bucket.printBucket();
+        
+    }
+
+    @Override
+    public void printMembershipLog() throws RemoteException {
+        printLog();
         
     }
 }

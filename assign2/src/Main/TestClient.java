@@ -42,6 +42,10 @@ public class TestClient {
                 case "PRINTSTORAGE":
                     node.printStorage();
                     break;
+                
+                case "PRINTLOG":
+                    node.printMembershipLog();
+                    break;
 
                 
                 case "PUT":

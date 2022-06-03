@@ -24,10 +24,25 @@ public class Stabilizer implements Runnable {
                     String key = kv.split("-")[0];
                     int kvD = Util.hashString(key) % 360;
  
-                    if(nextD - kvD < currD - kvD) {
-                        keysValuesToSend.add(kv);
+                    if(nextD > kvD) {
+
+                        if(nextD - kvD < currD - kvD) {
+                            keysValuesToSend.add(kv);
+                        }
                     }
                 }
+                if(keysValuesToSend.size() == 0) {
+
+                    for(String kv : Store.bucket.getKeysValues()) {
+                        String key = kv.split("-")[0];
+                        int kvD = Util.hashString(key) % 360;
+    
+                        if(nextD - kvD < currD - kvD) {
+                            keysValuesToSend.add(kv);
+                        }
+                    }
+                }
+                
                 if(keysValuesToSend.size() > 0) {
                     for(String kv : keysValuesToSend) {
                         String k = kv.split("-")[0];
