@@ -89,7 +89,6 @@ public class ProtocolReceiver implements Runnable {
         String key = header[1];
         
         String node = getNode(key);
-        System.out.println("NODE: " + node);
 
         if(node.equals("")) 
             node = Store.nodeId;
@@ -114,9 +113,7 @@ public class ProtocolReceiver implements Runnable {
         int hashKey=0;
         for(String node : Store.currentNodes) {
             hashId= Util.hashString(node)%360;
-            System.out.println(node + ": "+hashId);
             hashKey = Integer.parseInt(key)%360;
-            System.out.println(hashKey);
 
             if(hashId >= hashKey) {
                 distance = hashId-hashKey;
@@ -126,7 +123,7 @@ public class ProtocolReceiver implements Runnable {
         }
         
         hashId=distance+hashKey;
-        /// 
+
         if(distance==Integer.MAX_VALUE){
             for(String node : Store.currentNodes) {
                 hashId= Util.hashString(node)%360;
