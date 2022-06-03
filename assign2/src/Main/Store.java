@@ -70,6 +70,7 @@ public class Store implements RMIRemote {
 
         loadCounter();
         loadLog();
+        bucket.loadBucket();
 
         if(isMember()) {
 
@@ -79,11 +80,11 @@ public class Store implements RMIRemote {
             executor.execute(new MulticastChannel(mcastAddr, mcastPort));
             System.out.println(" > MultiCast Channel Open on: " + mcastAddr + ":" + Integer.toString(mcastPort));
 
-            executor.scheduleWithFixedDelay(new SetCurrentNodes(), 1, 10, TimeUnit.SECONDS);
+            executor.scheduleWithFixedDelay(new SetCurrentNodes(), 2, 2, TimeUnit.SECONDS);
             
-            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 3, 1, TimeUnit.SECONDS);
+            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 1, 1, TimeUnit.SECONDS);
 
-            Store.executor.scheduleWithFixedDelay(new Stabilizer(), 10, 5, TimeUnit.SECONDS);
+            Store.executor.scheduleWithFixedDelay(new Stabilizer(), 3, 3, TimeUnit.SECONDS);
         }
         
         Runtime.getRuntime().addShutdownHook(new Thread(Store::saveCounter));
@@ -252,6 +253,8 @@ public class Store implements RMIRemote {
             for(String node:Store.currentNodes) {
                 System.out.println(node);
             }
+
+            Store.bucket.saveBucket();
             
             Store.executor.shutdown();
 

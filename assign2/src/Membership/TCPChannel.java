@@ -51,6 +51,7 @@ public class TCPChannel implements Runnable {
 
     @Override
     public void run() {
+        int joinCounter = 1;
         try (ServerSocket serverSocket = new ServerSocket(this.port)) {
                 while(this.counter < 3) {
 
@@ -92,21 +93,22 @@ public class TCPChannel implements Runnable {
                 System.out.println("TCP");
             }
 
-        if(counter < 2) {
+        if(counter < 2 && joinCounter < 3) {
             
             String msg = "JOIN "+Store.nodeId+" "+Integer.toString(Store.mcastPort)+" "+Integer.toString(Store.counter)+"\r\n\r\n";
             Store.executor.execute(new SendMessage(msg));
+            joinCounter++;
         }
 
         if(counter > 2) {
             Store.executor.execute(new ProtocolReceiver(Store.storePort));
             System.out.println("> TCP Potocol Channel Open on: " + Integer.toString(Store.storePort));
             
-            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 10, 1, TimeUnit.SECONDS);
+            Store.executor.scheduleWithFixedDelay(new CastMembershipInfo(Store.mcastAddr, Store.mcastPort, Store.getLogs()), 1, 1, TimeUnit.SECONDS);
             
-            Store.executor.scheduleWithFixedDelay(new SetCurrentNodes(), 1, 10, TimeUnit.SECONDS);
+            Store.executor.scheduleWithFixedDelay(new SetCurrentNodes(), 2, 2, TimeUnit.SECONDS);
 
-            Store.executor.scheduleWithFixedDelay(new Stabilizer(), 1, 5, TimeUnit.SECONDS);
+            Store.executor.scheduleWithFixedDelay(new Stabilizer(), 3, 3, TimeUnit.SECONDS);
 
         }
         
